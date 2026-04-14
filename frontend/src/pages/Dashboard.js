@@ -21,8 +21,9 @@ export default function Dashboard() {
         ]);
         setPostedTasks(postedRes.data);
         setMyApplications(appsRes.data);
-      } catch {}
-      finally {
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+      } finally {
         setLoading(false);
       }
     };

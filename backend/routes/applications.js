@@ -50,10 +50,15 @@ router.get('/task/:taskId', authMiddleware, (req, res) => {
     ORDER BY a.created_at DESC
   `).all(req.params.taskId);
 
-  res.json(applications.map(app => ({
-    ...app,
-    freelancer_skills: JSON.parse(app.freelancer_skills || '[]'),
-  })));
+  res.json(applications.map(app => {
+    let skills = [];
+    try {
+      skills = JSON.parse(app.freelancer_skills || '[]');
+    } catch {
+      skills = [];
+    }
+    return { ...app, freelancer_skills: skills };
+  }));
 });
 
 // Get my applications

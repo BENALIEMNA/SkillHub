@@ -24,7 +24,9 @@ export default function Profile() {
       try {
         const { data } = await api.get('/users/me');
         setForm({ name: data.name, bio: data.bio || '', skills: data.skills || [] });
-      } catch {}
+      } catch (err) {
+        console.error('Failed to load profile:', err);
+      }
     };
     fetchProfile();
   }, []);
@@ -47,8 +49,9 @@ export default function Profile() {
       const { data } = await api.put('/users/me', form);
       updateUser({ ...user, ...data });
       setSuccess('Profile updated successfully!');
-    } catch {
+    } catch (err) {
       setError('Failed to update profile');
+      console.error('Profile update error:', err);
     } finally {
       setLoading(false);
     }

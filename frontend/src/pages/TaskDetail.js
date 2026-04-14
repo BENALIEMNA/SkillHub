@@ -24,8 +24,9 @@ export default function TaskDetail() {
     try {
       const { data } = await api.get(`/tasks/${id}`);
       setTask(data);
-    } catch {
+    } catch (err) {
       setError('Task not found');
+      console.error('Failed to load task:', err);
     } finally {
       setLoading(false);
     }
@@ -35,8 +36,11 @@ export default function TaskDetail() {
     try {
       const { data } = await api.get(`/applications/task/${id}`);
       setApplications(data);
-    } catch {
-      // not the owner, ignore
+    } catch (err) {
+      // Not the owner or not authenticated — applications are only visible to task owners
+      if (err.response?.status !== 401 && err.response?.status !== 403) {
+        console.error('Failed to load applications:', err);
+      }
     }
   }, [id]);
 
@@ -45,7 +49,9 @@ export default function TaskDetail() {
     try {
       const { data } = await api.get('/applications/my');
       setHasApplied(data.some((a) => a.task_id === parseInt(id)));
-    } catch {}
+    } catch (err) {
+      console.error('Failed to check applied status:', err);
+    }
   }, [user, id]);
 
   useEffect(() => {
@@ -77,7 +83,8 @@ export default function TaskDetail() {
       await api.put(`/applications/${appId}`, { status });
       fetchApplications();
       fetchTask();
-    } catch {
+    } catch (err) {
+      console.error('Failed to update application:', err);
       alert('Failed to update application');
     }
   };
@@ -87,7 +94,8 @@ export default function TaskDetail() {
     try {
       await api.delete(`/tasks/${id}`);
       navigate('/dashboard');
-    } catch {
+    } catch (err) {
+      console.error('Failed to delete task:', err);
       alert('Failed to delete task');
     }
   };
