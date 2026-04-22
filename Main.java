@@ -1,340 +1,346 @@
 package com.skillhub.models;
- 
+
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
- 
+
 /**
- * Point d'entrée de la démonstration SkillHub.
- * Exécute les scénarios Sprint 1 (V1) et Sprint 2 (V2).
- *
- * Compilation :
- *   javac -encoding UTF-8 -d out src/com/skillhub/models/*.java
- * Exécution :
- *   java -cp out com.skillhub.models.Main
+ * Main application class for SkillHub platform
+ * Provides interactive user interface for managing users, missions, and applications
  */
 public class Main {
- 
+    private static Scanner scanner = new Scanner(System.in);
+    private static List<Utilisateur> users = new ArrayList<>();
+    private static List<Mission> missions = new ArrayList<>();
+    private static List<Avis> reviews = new ArrayList<>();
+    private static Utilisateur currentUser = null;
+
     public static void main(String[] args) {
- 
-        // ????????????????????????????????????????????????????????
-        //   SkillHub ? Plateforme de Freelancing Étudiant
-        // ????????????????????????????????????????????????????????
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println("?         SkillHub ? Plateforme Freelancing Étudiant   ?");
-        System.out.println("?              Démonstration Complète (V2)              ?");
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println();
- 
-        // ????????????????????????????????????????????
-        // INITIALISATION DES OBJETS
-        // ????????????????????????????????????????????
- 
-        // Administrateur
-        Administrateur admin = new Administrateur(1, "Ben Ali", "Emna", "emna.admin@skillhub.tn", "admin123");
- 
-        // Étudiants freelances
-        EtudiantFreelance zeineb = new EtudiantFreelance(2, "Gharbi", "Zeineb",
-                "zeineb@etudiant.utm.tn", "pass1234", "Développement Web", "FSEGT", "Licence 3");
-        zeineb.ajouterCompetence("Java");
-        zeineb.ajouterCompetence("HTML/CSS");
- 
-        EtudiantFreelance yassmine = new EtudiantFreelance(3, "Mansour", "Yassmine",
-                "yassmine@etudiant.utm.tn", "pass5678", "Design Graphique", "ISG Tunis", "Master 1");
-        yassmine.ajouterCompetence("Figma");
-        yassmine.ajouterCompetence("Adobe Illustrator");
- 
-        EtudiantFreelance wafa = new EtudiantFreelance(4, "Jebali", "Wafa",
-                "wafa@etudiant.utm.tn", "pass9012", "Traduction", "FLSH Tunis", "Licence 2");
-        wafa.ajouterCompetence("Anglais B2");
-        wafa.ajouterCompetence("Traduction technique");
- 
-        // Clients
-        Client fatma = new Client(5, "Karray", "Fatma", "fatma.karray@fsegt.utm.tn",
-                "clientpass", "universitaire", "FSEGT ? Université Tunis El Manar", 500.0);
- 
-        Client entreprise = new Client(6, "Ben Salah", "Rania", "rania@startup.tn",
-                "clientpass2", "entreprise", "TechStart Tunis", 1000.0);
- 
-        // Listes globales pour le dashboard
-        List<Utilisateur> tousUtilisateurs = new ArrayList<>();
-        tousUtilisateurs.add(admin);
-        tousUtilisateurs.add(zeineb);
-        tousUtilisateurs.add(yassmine);
-        tousUtilisateurs.add(wafa);
-        tousUtilisateurs.add(fatma);
-        tousUtilisateurs.add(entreprise);
- 
-        List<Mission> toutesMissions = new ArrayList<>();
-        List<Avis> tousAvis = new ArrayList<>();
- 
-        // ????????????????????????????????????????????????????????
-        // SPRINT 1 ? Démonstration V1 (squelette de base)
-        // ????????????????????????????????????????????????????????
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println("?              === SkillHub ? Sprint 1 ===              ?");
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println();
- 
-        // F1 ? Authentification (Zeineb)
-        System.out.println("??? F1 : Authentification (Zeineb) ???????????????????");
-        zeineb.sInscrire("Gharbi", "Zeineb", "zeineb@etudiant.utm.tn", "pass1234");
-        fatma.sInscrire("Karray", "Fatma", "fatma.karray@fsegt.utm.tn", "clientpass");
-        System.out.println();
- 
-        // F2 ? Gestion des Missions (Fatma)
-        System.out.println("??? F2 : Gestion des Missions (Fatma) ????????????????");
-        Mission m1 = fatma.publierMission(1, "Création de logo association",
-                "Logo pour club étudiant de robotique", 150.0, "1 semaine", "Design Graphique");
-        toutesMissions.add(m1);
-        System.out.println();
- 
-        // F3 ? Recherche & Candidature (Yassmine)
-        System.out.println("??? F3 : Recherche & Candidature (Yassmine) ??????????");
-        List<Mission> resultats = Candidature.rechercherMissions(toutesMissions, "Design Graphique", 200.0);
-        System.out.println("  ?? Recherche : domaine=Design Graphique, budget ? 200 DT ? " + resultats.size() + " résultat(s) (mission en attente de validation)");
-        System.out.println();
- 
-        // F4 ? Notation & Avis (Wafa)
-        System.out.println("??? F4 : Notation & Avis (Wafa) ??????????????????????");
-        System.out.println("  ??  Notation disponible après validation et fin de mission ? voir Sprint 2.");
-        System.out.println();
- 
-        // F5 ? Tableau de Bord Admin (Emna)
-        System.out.println("??? F5 : Tableau de Bord Admin (Emna) ????????????????");
-        admin.afficherComptesEnAttente(tousUtilisateurs);
-        System.out.println();
- 
-        // ????????????????????????????????????????????????????????
-        // SPRINT 2 ? Démonstration V2 (scénarios complets)
-        // ????????????????????????????????????????????????????????
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println("?         === SkillHub ? Démonstration Finale (V2) ===  ?");
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Scénario 1 : Inscription ? Validation Admin ? Connexion
-        // ?????????????????????????????????????????????????????
-        System.out.println("?? Scénario 1 : Inscription & Validation de compte");
-        System.out.println("??????????????????????????????????????????????????????");
- 
-        // Les comptes sont en attente
-        System.out.println("  [Comptes en attente avant validation]");
-        admin.afficherComptesEnAttente(tousUtilisateurs);
-        System.out.println();
- 
-        // Admin valide les comptes
-        System.out.println("  [L'admin valide les comptes]");
-        admin.validerCompte(zeineb, true, null);
-        admin.validerCompte(yassmine, true, null);
-        admin.validerCompte(wafa, true, null);
-        admin.validerCompte(fatma, true, null);
-        admin.validerCompte(entreprise, true, null);
- 
-        // Test de rejet
-        EtudiantFreelance fakeProfil = new EtudiantFreelance(99, "Faux", "Compte",
-                "fake@mail.com", "1234", "Spam", "Inconnu", "N/A");
-        admin.validerCompte(fakeProfil, false, "Profil incomplet et suspect");
-        System.out.println();
- 
-        // Connexion après validation
-        System.out.println("  [Connexion des utilisateurs]");
-        zeineb.seConnecter("zeineb@etudiant.utm.tn", "pass1234");
-        fatma.seConnecter("fatma.karray@fsegt.utm.tn", "clientpass");
-        System.out.println("  [Test connexion avec mauvais mot de passe]");
-        yassmine.seConnecter("yassmine@etudiant.utm.tn", "mauvaismdp");
-        // On corrige
-        yassmine.seConnecter("yassmine@etudiant.utm.tn", "pass5678");
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Scénario 2 : Publication & Validation de missions
-        // ?????????????????????????????????????????????????????
-        System.out.println("?? Scénario 2 : Publication et validation de missions");
-        System.out.println("??????????????????????????????????????????????????????");
- 
-        Mission m2 = entreprise.publierMission(2, "Développement site vitrine",
-                "Site web 5 pages pour startup FinTech", 800.0, "3 semaines", "Développement Web");
-        Mission m3 = fatma.publierMission(3, "Traduction rapport annuel",
-                "Traduction FR?EN d'un rapport de 20 pages", 200.0, "4 jours", "Traduction");
-        Mission m4 = fatma.publierMission(4, "Identité visuelle club",
-                "Logo + charte graphique pour club culturel", 120.0, "10 jours", "Design Graphique");
-        toutesMissions.add(m2);
-        toutesMissions.add(m3);
-        toutesMissions.add(m4);
-        System.out.println();
- 
-        // Admin valide les missions
-        System.out.println("  [L'admin valide les missions]");
-        admin.validerMission(m1);
-        admin.validerMission(m2);
-        admin.validerMission(m3);
-        admin.validerMission(m4);
-        System.out.println();
- 
-        // Modifier une mission (avant candidature acceptée)
-        System.out.println("  [Modification de mission]");
-        fatma.modifierMission(m3, "Traduction rapport annuel (révisé)", 220.0);
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Scénario 3 : Recherche & Candidature
-        // ?????????????????????????????????????????????????????
-        System.out.println("?? Scénario 3 : Recherche de missions & Candidatures");
-        System.out.println("??????????????????????????????????????????????????????");
- 
-        System.out.println("  ?? Yassmine cherche des missions en Design Graphique ? 200 DT :");
-        List<Mission> missionsDesign = Candidature.rechercherMissions(toutesMissions, "Design Graphique", 200.0);
-        System.out.println("  ? " + missionsDesign.size() + " mission(s) trouvée(s) :");
-        for (Mission m : missionsDesign) {
-            System.out.println("    ? [#" + m.getId() + "] " + m.getTitre() + " ? " + m.getBudget() + " DT ? " + m.getDelai());
+        displayWelcome();
+        mainMenu();
+    }
+
+    private static void displayWelcome() {
+        System.out.println("\n================================================");
+        System.out.println("     Welcome to SkillHub - Freelancing Platform");
+        System.out.println("================================================\n");
+    }
+
+    private static void mainMenu() {
+        boolean running = true;
+        while (running) {
+            if (currentUser == null) {
+                System.out.println("\n--- Main Menu ---");
+                System.out.println("1. Register");
+                System.out.println("2. Login");
+                System.out.println("3. Exit");
+                System.out.print("Choose an option: ");
+
+                int choice = getIntInput();
+                switch (choice) {
+                    case 1:
+                        registerUser();
+                        break;
+                    case 2:
+                        loginUser();
+                        break;
+                    case 3:
+                        running = false;
+                        System.out.println("Thank you for using SkillHub!");
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            } else {
+                userDashboard();
+            }
         }
-        System.out.println();
- 
-        System.out.println("  ?? Zeineb cherche des missions en Développement Web ? 1000 DT :");
-        List<Mission> missionsDev = Candidature.rechercherMissions(toutesMissions, "Développement Web", 1000.0);
-        System.out.println("  ? " + missionsDev.size() + " mission(s) trouvée(s) :");
-        for (Mission m : missionsDev) {
-            System.out.println("    ? [#" + m.getId() + "] " + m.getTitre() + " ? " + m.getBudget() + " DT");
+        scanner.close();
+    }
+
+    private static void registerUser() {
+        System.out.println("\n--- Register New Account ---");
+        System.out.print("First Name: ");
+        String prenom = scanner.nextLine().trim();
+
+        System.out.print("Last Name: ");
+        String nom = scanner.nextLine().trim();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
+        System.out.print("Password (min 6 characters): ");
+        String password = scanner.nextLine().trim();
+
+        System.out.println("\nSelect User Type:");
+        System.out.println("1. Student Freelancer");
+        System.out.println("2. Client");
+        System.out.print("Choose: ");
+
+        int userType = getIntInput();
+
+        if (userType == 1) {
+            registerStudentFreelancer(prenom, nom, email, password);
+        } else if (userType == 2) {
+            registerClient(prenom, nom, email, password);
+        } else {
+            System.out.println("Invalid option.");
         }
-        System.out.println();
- 
-        // Candidatures
-        System.out.println("  [Envoi des candidatures]");
-        Candidature c1 = new Candidature(1, yassmine, m1,
-                "Passionnée de design, j'ai réalisé plusieurs logos pour des associations FSEGT.", 140.0);
-        c1.postuler();
- 
-        Candidature c2 = new Candidature(2, yassmine, m4,
-                "Je propose une charte graphique complète dans les délais impartis.", 115.0);
-        c2.postuler();
- 
-        Candidature c3 = new Candidature(3, zeineb, m2,
-                "Développeur web Java/HTML/CSS, je peux livrer en 2 semaines.", 750.0);
-        c3.postuler();
- 
-        Candidature c4 = new Candidature(4, wafa, m3,
-                "Traductrice FR?EN expérimentée avec des rapports techniques.", 210.0);
-        c4.postuler();
-        System.out.println();
- 
-        // Suivi des candidatures
-        System.out.println("  [Suivi des candidatures de Yassmine]");
-        c1.afficherStatut();
-        c2.afficherStatut();
-        System.out.println();
- 
-        // Sélection des candidats
-        System.out.println("  [Les clients sélectionnent leurs freelances]");
-        fatma.selectionnerCandidat(m1, c1);
-        entreprise.selectionnerCandidat(m2, c3);
-        fatma.selectionnerCandidat(m3, c4);
- 
-        // Tentative de modifier une mission déjà en cours
-        System.out.println();
-        System.out.println("  [Tentative de modification d'une mission avec candidature acceptée]");
-        fatma.modifierMission(m1, "Nouveau titre", 200.0);
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Scénario 4 : Livraison & Notation
-        // ?????????????????????????????????????????????????????
-        System.out.println("?? Scénario 4 : Livraison des missions & Notation");
-        System.out.println("??????????????????????????????????????????????????????");
- 
-        // Missions terminées
-        m1.terminer();
-        m2.terminer();
-        m3.terminer();
-        System.out.println();
- 
-        // Profil des étudiants avant notation
-        System.out.println("  [Profils avant notation]");
-        yassmine.afficherProfil();
-        System.out.println();
- 
-        // Ajout des avis
-        System.out.println("  [Ajout des avis]");
-        Avis avis1 = new Avis(1, 5, "Travail excellent ! Logo livré avant le délai, très créatif.", fatma, yassmine, m1);
-        avis1.ajouterAvis();
-        tousAvis.add(avis1);
- 
-        Avis avis2 = new Avis(2, 4, "Site bien développé, quelques ajustements mineurs demandés.", entreprise, zeineb, m2);
-        avis2.ajouterAvis();
-        tousAvis.add(avis2);
- 
-        Avis avis3 = new Avis(3, 5, "Traduction parfaite, terminologie technique maîtrisée.", fatma, wafa, m3);
-        avis3.ajouterAvis();
-        tousAvis.add(avis3);
- 
-        // Réponse d'un étudiant à un avis
-        System.out.println();
-        System.out.println("  [Réponse de Zeineb à l'avis reçu]");
-        avis2.repondreAvis("Merci pour votre retour ! Je prends note pour mes prochaines missions.");
- 
-        // Signalement d'un avis
-        System.out.println();
-        System.out.println("  [Test : signalement d'un avis injuste]");
-        Avis avisControverse = new Avis(4, 1, "Mission non faite !", entreprise, yassmine, m1);
-        // Note : m1 est terminée mais l'avis est fictif pour la démo
-        avisControverse.setSignale(true); // simulation d'un signalement
-        admin.modererAvis(avisControverse, true);
-        System.out.println();
- 
-        // Afficher tous les avis d'un étudiant
-        System.out.println("  [Récapitulatif des avis de Yassmine]");
-        List<Avis> avisYassmine = new ArrayList<>();
-        avisYassmine.add(avis1);
-        Avis.afficherAvis(avisYassmine, yassmine);
-        System.out.println();
- 
-        System.out.println("  [Profil de Yassmine après notation]");
-        yassmine.afficherProfil();
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Scénario 5 : Tableau de Bord Admin complet
-        // ?????????????????????????????????????????????????????
-        System.out.println("?? Scénario 5 : Tableau de Bord Administrateur");
-        System.out.println("??????????????????????????????????????????????????????");
- 
-        // Mission sans candidature pour déclencher une alerte
-        Mission m5 = entreprise.publierMission(5, "Montage vidéo promotionnel",
-                "Clip de 30 secondes pour produit tech", 350.0, "2 semaines", "Multimédia");
-        admin.validerMission(m5);
-        toutesMissions.add(m5);
- 
-        // Calcul des revenus (10% de commission sur missions terminées)
-        double revenusJour = (m1.getBudget() + m2.getBudget() + m3.getBudget()) * 0.10;
- 
-        admin.afficherStatistiques(tousUtilisateurs, toutesMissions, revenusJour);
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Fermeture d'une mission
-        // ?????????????????????????????????????????????????????
-        System.out.println("?? Scénario 6 : Fermeture d'une mission");
-        System.out.println("??????????????????????????????????????????????????????");
-        fatma.fermerMission(m4);
-        System.out.println();
- 
-        // ?????????????????????????????????????????????????????
-        // Résumé final
-        // ?????????????????????????????????????????????????????
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println("?                  RÉSUMÉ FINAL SkillHub               ?");
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.printf("?  ?? Utilisateurs actifs      : %d/%-20s  ?%n",
-                tousUtilisateurs.stream().filter(u -> u.getStatut().equals("actif")).count(), 6);
-        System.out.printf("?  ?? Missions créées          : %d/%-20s  ?%n", toutesMissions.size(), 5);
-        System.out.printf("?  ?? Candidatures soumises    : %d/%-20s  ?%n", 4, 4);
-        System.out.printf("?  ?? Missions terminées       : %d/%-20s  ?%n", 3, 5);
-        System.out.printf("?  ? Avis publiés             : %d/%-20s  ?%n", tousAvis.size(), 3);
-        System.out.printf("?  ?? Commission plateforme    : %.1f DT%-14s  ?%n",
-                revenusJour, "");
-        System.out.println("????????????????????????????????????????????????????????");
-        System.out.println();
-        System.out.println("  ? Démonstration SkillHub terminée avec succès !");
-        System.out.println("  ?? Bon courage pour la soutenance ? Équipe SkillHub 2026 !");
+    }
+
+    private static void registerStudentFreelancer(String prenom, String nom, String email, String password) {
+        System.out.println("\n--- Additional Information ---");
+        System.out.print("University: ");
+        String university = scanner.nextLine().trim();
+
+        System.out.print("Field of Study (e.g., Web Development, Design): ");
+        String domain = scanner.nextLine().trim();
+
+        System.out.print("Year of Study (e.g., Licence 2, Master 1): ");
+        String year = scanner.nextLine().trim();
+
+        int id = users.size() + 1;
+        EtudiantFreelance student = new EtudiantFreelance(id, nom, prenom, email, password, domain, university, year);
+
+        if (student.sInscrire(nom, prenom, email, password)) {
+            users.add(student);
+            System.out.println("\nRegistration successful! Your account is pending admin approval.");
+            System.out.println("You will receive a confirmation email at: " + email);
+        }
+    }
+
+    private static void registerClient(String prenom, String nom, String email, String password) {
+        System.out.println("\n--- Additional Information ---");
+        System.out.print("Company/Organization Name: ");
+        String organization = scanner.nextLine().trim();
+
+        System.out.println("Select Client Type:");
+        System.out.println("1. Individual");
+        System.out.println("2. Academic");
+        System.out.println("3. Enterprise");
+        System.out.print("Choose: ");
+
+        String clientType = "individual";
+        int type = getIntInput();
+        if (type == 2) clientType = "academic";
+        else if (type == 3) clientType = "enterprise";
+
+        int id = users.size() + 1;
+        Client client = new Client(id, nom, prenom, email, password, clientType, organization, 0.0);
+
+        if (client.sInscrire(nom, prenom, email, password)) {
+            users.add(client);
+            System.out.println("\nRegistration successful! Your account is pending admin approval.");
+        }
+    }
+
+    private static void loginUser() {
+        System.out.println("\n--- Login ---");
+        System.out.print("Email: ");
+        String email = scanner.nextLine().trim();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine().trim();
+
+        // Find user
+        for (Utilisateur user : users) {
+            if (user.getEmail().equals(email)) {
+                if (user.seConnecter(email, password)) {
+                    currentUser = user;
+                    return;
+                } else {
+                    System.out.println("Login failed. Invalid password or account not activated.");
+                    return;
+                }
+            }
+        }
+        System.out.println("User not found.");
+    }
+
+    private static void userDashboard() {
+        System.out.println("\n--- Dashboard for " + currentUser.getPrenom() + " " + currentUser.getNom() + " ---");
+
+        if (currentUser instanceof EtudiantFreelance) {
+            studentMenu((EtudiantFreelance) currentUser);
+        } else if (currentUser instanceof Client) {
+            clientMenu((Client) currentUser);
+        }
+    }
+
+    private static void studentMenu(EtudiantFreelance student) {
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\n--- Student Freelancer Menu ---");
+            System.out.println("1. View Profile");
+            System.out.println("2. Add Skill");
+            System.out.println("3. Search Missions");
+            System.out.println("4. View My Applications");
+            System.out.println("5. Logout");
+            System.out.print("Choose: ");
+
+            int choice = getIntInput();
+            switch (choice) {
+                case 1:
+                    student.afficherProfil();
+                    break;
+                case 2:
+                    addSkill(student);
+                    break;
+                case 3:
+                    searchMissions(student);
+                    break;
+                case 4:
+                    viewApplications(student);
+                    break;
+                case 5:
+                    currentUser.seDeconnecter();
+                    currentUser = null;
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private static void clientMenu(Client client) {
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\n--- Client Menu ---");
+            System.out.println("1. View Profile");
+            System.out.println("2. Publish Mission");
+            System.out.println("3. View My Missions");
+            System.out.println("4. Logout");
+            System.out.print("Choose: ");
+
+            int choice = getIntInput();
+            switch (choice) {
+                case 1:
+                    System.out.println(client.toString());
+                    break;
+                case 2:
+                    publishMission(client);
+                    break;
+                case 3:
+                    client.consulterMissions();
+                    break;
+                case 4:
+                    currentUser.seDeconnecter();
+                    currentUser = null;
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private static void addSkill(EtudiantFreelance student) {
+        System.out.print("\nEnter skill name: ");
+        String skill = scanner.nextLine().trim();
+        student.ajouterCompetence(skill);
+    }
+
+    private static void searchMissions(EtudiantFreelance student) {
+        System.out.println("\n--- Search Missions ---");
+        System.out.print("Enter domain (leave empty for all): ");
+        String domain = scanner.nextLine().trim();
+
+        System.out.print("Maximum budget (leave empty for unlimited): ");
+        String budgetStr = scanner.nextLine().trim();
+        double budget = budgetStr.isEmpty() ? 0 : Double.parseDouble(budgetStr);
+
+        List<Mission> results = Candidature.rechercherMissions(missions, domain.isEmpty() ? null : domain, budget);
+
+        if (results.isEmpty()) {
+            System.out.println("\nNo missions found matching your criteria.");
+        } else {
+            System.out.println("\n--- Available Missions (" + results.size() + ") ---");
+            for (int i = 0; i < results.size(); i++) {
+                Mission m = results.get(i);
+                System.out.println((i + 1) + ". " + m.getTitre() + " - " + m.getBudget() + " DT (" + m.getDelai() + ")");
+            }
+
+            System.out.print("\nSelect mission (0 to cancel): ");
+            int choice = getIntInput();
+            if (choice > 0 && choice <= results.size()) {
+                applyMission(student, results.get(choice - 1));
+            }
+        }
+    }
+
+    private static void applyMission(EtudiantFreelance student, Mission mission) {
+        System.out.println("\n--- Apply to Mission: " + mission.getTitre() + " ---");
+        System.out.print("Proposed Budget: ");
+        double proposedBudget = getDoubleInput();
+
+        System.out.print("Motivation Letter: ");
+        String motivation = scanner.nextLine().trim();
+
+        int id = missions.size() + 1;
+        Candidature application = new Candidature(id, student, mission, motivation, proposedBudget);
+
+        if (application.postuler()) {
+            System.out.println("Application submitted successfully!");
+        }
+    }
+
+    private static void viewApplications(EtudiantFreelance student) {
+        List<Candidature> apps = student.getCandidatures();
+        if (apps.isEmpty()) {
+            System.out.println("\nYou have no applications.");
+        } else {
+            System.out.println("\n--- Your Applications (" + apps.size() + ") ---");
+            for (Candidature app : apps) {
+                System.out.println("• " + app.getMission().getTitre() + " - Status: " + app.getStatut());
+            }
+        }
+    }
+
+    private static void publishMission(Client client) {
+        System.out.println("\n--- Publish New Mission ---");
+        System.out.print("Title: ");
+        String title = scanner.nextLine().trim();
+
+        System.out.print("Description: ");
+        String description = scanner.nextLine().trim();
+
+        System.out.print("Budget (DT): ");
+        double budget = getDoubleInput();
+
+        System.out.print("Deadline (e.g., 2 weeks): ");
+        String deadline = scanner.nextLine().trim();
+
+        System.out.print("Domain (e.g., Web Development): ");
+        String domain = scanner.nextLine().trim();
+
+        int id = missions.size() + 1;
+        Mission mission = client.publierMission(id, title, description, budget, deadline, domain);
+
+        if (mission != null) {
+            missions.add(mission);
+            System.out.println("\nMission published successfully! Awaiting admin approval.");
+        }
+    }
+
+    private static int getIntInput() {
+        try {
+            int value = Integer.parseInt(scanner.nextLine().trim());
+            return value;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            return -1;
+        }
+    }
+
+    private static double getDoubleInput() {
+        try {
+            double value = Double.parseDouble(scanner.nextLine().trim());
+            return value;
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            return -1;
+        }
     }
 }
+
