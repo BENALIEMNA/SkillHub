@@ -1,11 +1,11 @@
 package com.skillhub.models;
- 
+
 /**
  * Classe de base représentant un utilisateur de la plateforme SkillHub.
  * Responsable : Zeineb (Authentification)
  */
 public abstract class Utilisateur {
- 
+
     // Champs privés
     private int id;
     private String nom;
@@ -14,11 +14,12 @@ public abstract class Utilisateur {
     private String motDePasse;
     private String statut; // "actif", "en_attente", "rejeté"
     private String typeRole; // "etudiant", "client", "admin"
-   // Constructeur vide
+
+    // Constructeur vide
     public Utilisateur() {
         this.statut = "en_attente";
     }
- 
+
     // Constructeur complet
     public Utilisateur(int id, String nom, String prenom, String email, String motDePasse, String typeRole) {
         this.id = id;
@@ -29,9 +30,9 @@ public abstract class Utilisateur {
         this.typeRole = typeRole;
         this.statut = "en_attente";
     }
- 
+
     // Méthodes métier
- 
+
     /**
      * Inscription d'un nouvel utilisateur.
      * Valide les champs et crée le compte avec statut 'en_attente'.
@@ -58,7 +59,7 @@ public abstract class Utilisateur {
         System.out.println("  ?? Email de confirmation envoyé à : " + email);
         return true;
     }
- 
+
     /**
      * Connexion de l'utilisateur avec email et mot de passe.
      */
@@ -78,14 +79,14 @@ public abstract class Utilisateur {
         System.out.println("  ? Connexion réussie ! Bienvenue, " + this.prenom + " " + this.nom + " (" + this.typeRole + ")");
         return true;
     }
- 
+
     /**
      * Déconnexion de l'utilisateur.
      */
     public void seDeconnecter() {
         System.out.println("  ?? " + this.prenom + " " + this.nom + " s'est déconnecté.");
     }
- 
+
     // Getters
     public int getId() { return id; }
     public String getNom() { return nom; }
@@ -94,7 +95,7 @@ public abstract class Utilisateur {
     public String getMotDePasse() { return motDePasse; }
     public String getStatut() { return statut; }
     public String getTypeRole() { return typeRole; }
- 
+
     // Setters
     public void setId(int id) { this.id = id; }
     public void setNom(String nom) { this.nom = nom; }
@@ -103,13 +104,11 @@ public abstract class Utilisateur {
     public void setMotDePasse(String motDePasse) { this.motDePasse = motDePasse; }
     public void setStatut(String statut) { this.statut = statut; }
     public void setTypeRole(String typeRole) { this.typeRole = typeRole; }
- 
+
     @Override
     public String toString() {
-        return "[" + typeRole.toUpperCase() + "] " + prenom + " " + nom + " | Email : " + email + " | Statut : " + statut;
+        return getClass().getSimpleName() + "{id=" + id + ", nom=" + nom + ", prenom=" + prenom
+                + ", email=" + email + ", statut=" + statut + ", role=" + typeRole + "}";
     }
 }
- 
 
- 
-  
