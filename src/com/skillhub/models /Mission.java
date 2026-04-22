@@ -1,14 +1,14 @@
 package com.skillhub.models;
- 
+
 import java.util.ArrayList;
 import java.util.List;
- 
+
 /**
  * Représente une mission publiée sur la plateforme SkillHub.
  * Responsable : Fatma (Gestion des Missions)
  */
 public class Mission {
- 
+
     // Champs privés
     private int id;
     private String titre;
@@ -20,14 +20,14 @@ public class Mission {
     private Client client;
     private List<Candidature> candidatures;
     private boolean uneCandiatureAcceptee;
- 
+
     // Constructeur vide
     public Mission() {
         this.candidatures = new ArrayList<>();
         this.statut = "en_attente";
         this.uneCandiatureAcceptee = false;
     }
- 
+
     // Constructeur complet
     public Mission(int id, String titre, String description, double budget,
                    String delai, String domaine, Client client) {
@@ -42,9 +42,9 @@ public class Mission {
         this.candidatures = new ArrayList<>();
         this.uneCandiatureAcceptee = false;
     }
- 
+
     // Méthodes métier
- 
+
     /**
      * Activer la mission après validation admin.
      */
@@ -52,7 +52,7 @@ public class Mission {
         this.statut = "active";
         System.out.println("  ? Mission \"" + titre + "\" activée et visible sur la plateforme.");
     }
- 
+
     /**
      * Marquer la mission comme terminée.
      */
@@ -60,14 +60,14 @@ public class Mission {
         this.statut = "terminée";
         System.out.println("  ?? Mission \"" + titre + "\" marquée comme terminée.");
     }
- 
+
     /**
      * Ajouter une candidature à cette mission.
      */
     public void ajouterCandidature(Candidature candidature) {
         candidatures.add(candidature);
     }
- 
+
     /**
      * Afficher les détails de la mission.
      */
@@ -82,7 +82,7 @@ public class Mission {
         System.out.println("  ? ?? Candidatures : " + candidatures.size());
         System.out.println("  ??????????????????????????????????????????");
     }
- 
+
     // Getters
     public int getId() { return id; }
     public String getTitre() { return titre; }
@@ -94,7 +94,7 @@ public class Mission {
     public Client getClient() { return client; }
     public List<Candidature> getCandidatures() { return candidatures; }
     public boolean isUneCandiatureAcceptee() { return uneCandiatureAcceptee; }
- 
+
     // Setters
     public void setId(int id) { this.id = id; }
     public void setTitre(String titre) { this.titre = titre; }
@@ -104,11 +104,12 @@ public class Mission {
     public void setDomaine(String domaine) { this.domaine = domaine; }
     public void setStatut(String statut) { this.statut = statut; }
     public void setClient(Client client) { this.client = client; }
-    public void setUneCandiatureAcceptee(boolean b) { this.uneCandiatureAcceptee = b; }
- 
+    public void setCandidatures(List<Candidature> candidatures) { this.candidatures = candidatures; }
+    public void setCandidatureAcceptee(boolean candidatureAcceptee) { this.uneCandiatureAcceptee = candidatureAcceptee; }
+
     @Override
     public String toString() {
         return "Mission{#" + id + " | " + titre + " | " + domaine + " | " + budget + " DT | " + statut + "}";
     }
 }
- 
+
