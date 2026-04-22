@@ -1,21 +1,21 @@
 package com.skillhub.models;
- 
+
 import java.util.ArrayList;
 import java.util.List;
- 
+
 /**
  * Représente un client sur la plateforme SkillHub.
  * Hérite de Utilisateur.
  * Responsable : Fatma (Gestion des Missions)
  */
 public class Client extends Utilisateur {
- 
+
     // Champs privés
     private String typeClient;    // "particulier", "universitaire", "entreprise"
     private String organisation;
     private List<Mission> missions;
     private double solde;         // en Dinar Tunisien (DT)
- 
+
     // Constructeur vide
     public Client() {
         super();
@@ -23,7 +23,7 @@ public class Client extends Utilisateur {
         this.solde = 0.0;
         setTypeRole("client");
     }
- 
+
     // Constructeur complet
     public Client(int id, String nom, String prenom, String email,
                   String motDePasse, String typeClient, String organisation, double solde) {
@@ -33,9 +33,9 @@ public class Client extends Utilisateur {
         this.missions = new ArrayList<>();
         this.solde = solde;
     }
- 
+
     // Méthodes métier
- 
+
     /**
      * Publier une nouvelle mission sur la plateforme.
      */
@@ -49,13 +49,27 @@ public class Client extends Utilisateur {
             System.out.println("  ? Erreur : Le budget doit être positif.");
             return null;
         }
-        Mission mission = new Mission(id, titre, description, budget, delai, domaine, this);
-        missions.add(mission);
-        System.out.println("  ? Mission publiée : \"" + titre + "\" ? " + budget + " DT ? Domaine : " + domaine);
-        System.out.println("  ?? En attente de validation par l'administrateur.");
-        return mission;
+        Mission m = new Mission(id, titre, description, budget, delai, domaine, this);
+        missions.add(m);
+        System.out.println("  ? Mission \"" + titre + "\" créée avec succès. En attente de validation admin.");
+        System.out.println("  ?? Budget : " + budget + " DT | Délai : " + delai);
+        return m;
     }
- 
+
+    /**
+     * Consulter l'historique des missions du client.
+     */
+    public void consulterMissions() {
+        System.out.println("  ?? Missions du client " + getPrenom() + " " + getNom() + " :");
+        if (missions.isEmpty()) {
+            System.out.println("  ? Aucune mission publiée.");
+            return;
+        }
+        for (Mission m : missions) {
+            System.out.println("  ? - " + m.getTitre() + " | Budget : " + m.getBudget() + " DT | Statut : " + m.getStatut());
+        }
+    }
+
     /**
      * Modifier une mission existante (seulement si aucune candidature n'est acceptée).
      */
@@ -73,7 +87,7 @@ public class Client extends Utilisateur {
         System.out.println("  ? Mission modifiée : \"" + nouveauTitre + "\" ? " + nouveauBudget + " DT");
         return true;
     }
- 
+
     /**
      * Fermer une mission et notifier les candidats.
      */
@@ -86,7 +100,7 @@ public class Client extends Utilisateur {
         System.out.println("  ?? Mission \"" + mission.getTitre() + "\" fermée.");
         System.out.println("  ?? " + mission.getCandidatures().size() + " candidat(s) notifié(s) de la fermeture.");
     }
- 
+
     /**
      * Sélectionner un candidat pour une mission.
      */
@@ -96,26 +110,46 @@ public class Client extends Utilisateur {
             return;
         }
         candidature.setStatut("acceptée");
-        mission.setUneCandiatureAcceptee(true);
+        mission.setCandidatureAcceptee(true);
         mission.setStatut("en_cours");
         System.out.println("  ? Candidature de " + candidature.getEtudiant().getPrenom()
                 + " " + candidature.getEtudiant().getNom() + " acceptée pour la mission \""
                 + mission.getTitre() + "\".");
     }
- 
+
+    /**
+     * Accepter la candidature d'un étudiant pour une mission.
+     */
+    public void accepterCandidature(Candidature candidature, Mission mission) {
+        candidature.setStatut("acceptée");
+        mission.setCandidatureAcceptee(true);
+        System.out.println("  ? Candidature de " + candidature.getEtudiant().getPrenom() + " acceptée pour \"" + mission.getTitre() + "\".");
+        System.out.println("  ?? Notification envoyée à l'étudiant.");
+    }
+
+    /**
+     * Refuser la candidature d'un étudiant.
+     */
+    public void refuserCandidature(Candidature candidature) {
+        candidature.setStatut("refusée");
+        System.out.println("  ? Candidature refusée pour " + candidature.getEtudiant().getPrenom());
+    }
+
     // Getters
     public String getTypeClient() { return typeClient; }
     public String getOrganisation() { return organisation; }
     public List<Mission> getMissions() { return missions; }
     public double getSolde() { return solde; }
- 
+
     // Setters
     public void setTypeClient(String typeClient) { this.typeClient = typeClient; }
     public void setOrganisation(String organisation) { this.organisation = organisation; }
+    public void setMissions(List<Mission> missions) { this.missions = missions; }
     public void setSolde(double solde) { this.solde = solde; }
- 
+
     @Override
     public String toString() {
-        return "Client{" + getPrenom() + " " + getNom() + " | " + organisation + " | " + missions.size() + " mission(s)}";
+        return "Client{nom=" + getNom() + ", type=" + typeClient + ", organisation=" + organisation
+                + ", missions=" + missions.size() + ", solde=" + solde + " DT}";
     }
 }
