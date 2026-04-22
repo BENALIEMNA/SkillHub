@@ -115,5 +115,3 @@ public class EtudiantFreelance extends Utilisateur {
                 + ", moyenne=" + noteMoyenne + ", candidatures=" + candidatures.size() + "}";
     }
 }
-
-
