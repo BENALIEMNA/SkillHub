@@ -2,6 +2,7 @@ package com.skillhub.models;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Représente un étudiant freelance sur la plateforme SkillHub.
  * Hérite de Utilisateur.
@@ -49,30 +50,45 @@ public class EtudiantFreelance extends Utilisateur {
      */
     public void ajouterCompetence(String competence) {
         competences.add(competence);
-        System.out.println("  ? Compétence ajoutée : " + competence);
+        System.out.println("  ? Compétence \"" + competence + "\" ajoutée au profil.");
     }
 
     /**
-     * Afficher le profil complet de l'étudiant.
+     * Consulter les missions disponibles et postuler.
+     */
+    public void consulterMissions(List<Mission> missions) {
+        System.out.println("  ?? Missions disponibles pour " + getPrenom() + " " + getNom() + " :");
+        if (missions.isEmpty()) {
+            System.out.println("  ? Aucune mission disponible.");
+            return;
+        }
+        for (Mission m : missions) {
+            System.out.println("  ? - " + m.getTitre() + " | Budget : " + m.getBudget() + " DT | Domaine : " + m.getDomaine());
+        }
+    }
+
+    /**
+     * Mettre à jour la note moyenne de l'étudiant.
+     */
+    public void mettreAJourNote(int noteNouvelle) {
+        nbAvisRecus++;
+        noteMoyenne = Math.round(((noteMoyenne * (nbAvisRecus - 1)) + noteNouvelle) / nbAvisRecus * 10.0) / 10.0;
+        System.out.println("  ? Nouvelle note moyenne : " + noteMoyenne + " ⭐ (" + nbAvisRecus + " avis)");
+    }
+
+    /**
+     * Afficher le profil de l'étudiant freelance.
      */
     public void afficherProfil() {
         System.out.println("  ??????????????????????????????????????????");
-        System.out.println("  ? ?? Profil : " + getPrenom() + "" + getNom());
-        System.out.println("  ? ?? " + niveauEtude + " ? " + universite);
+        System.out.println("  ? ?? Profil : " + getPrenom() + " " + getNom());
+        System.out.println("  ? ?? Université : " + universite);
+        System.out.println("  ? ?? Niveau : " + niveauEtude);
         System.out.println("  ? ?? Domaine : " + domaine);
-        System.out.println("  ? ? Note : " + (nbAvisRecus == 0 ? "Aucun avis" : noteMoyenne + "/5 (" + nbAvisRecus + " avis)"));
-        System.out.println("  ? ??  Compétences : " + (competences.isEmpty() ? "Non renseignées" : String.join(", ", competences)));
+        System.out.println("  ? ?? Note moyenne : " + noteMoyenne + " ⭐ (" + nbAvisRecus + " avis)");
+        System.out.println("  ? ?? Compétences : " + competences);
+        System.out.println("  ? ?? Candidatures : " + candidatures.size());
         System.out.println("  ??????????????????????????????????????????");
-    }
-
-    /**
-     * Mise à jour de la note moyenne après réception d'un nouvel avis.
-     */
-    public void mettreAJourNote(double nouvelleNote) {
-        double totalPoints = noteMoyenne * nbAvisRecus + nouvelleNote;
-        nbAvisRecus++;
-        noteMoyenne = Math.round((totalPoints / nbAvisRecus) * 10.0) / 10.0;
-        System.out.println("  ?? Nouvelle moyenne de " + getPrenom() + "" + getNom() + " : " + noteMoyenne + "/5 (" + nbAvisRecus + " avis)");
     }
 
     // Getters
@@ -90,11 +106,14 @@ public class EtudiantFreelance extends Utilisateur {
     public void setNiveauEtude(String niveauEtude) { this.niveauEtude = niveauEtude; }
     public void setNoteMoyenne(double noteMoyenne) { this.noteMoyenne = noteMoyenne; }
     public void setNbAvisRecus(int nbAvisRecus) { this.nbAvisRecus = nbAvisRecus; }
+    public void setCompetences(List<String> competences) { this.competences = competences; }
+    public void setCandidatures(List<Candidature> candidatures) { this.candidatures = candidatures; }
 
     @Override
     public String toString() {
-        return "EtudiantFreelance{" + getPrenom() + "" + getNom() +
-" | " + domaine + " | ? " + noteMoyenne + "/5}";
+        return "EtudiantFreelance{nom=" + getNom() + ", domaine=" + domaine + ", universite=" + universite
+                + ", moyenne=" + noteMoyenne + ", candidatures=" + candidatures.size() + "}";
     }
 }
+
 
