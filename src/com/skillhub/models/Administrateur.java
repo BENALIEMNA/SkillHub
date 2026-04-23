@@ -1,155 +1,177 @@
 package com.skillhub.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Représente un client sur la plateforme SkillHub.
+ * Représente l'administrateur de la plateforme SkillHub.
  * Hérite de Utilisateur.
- * Responsable : Fatma (Gestion des Missions)
+ * Responsable : Emna (Tableau de Bord Admin)
  */
-public class Client extends Utilisateur {
+public class Administrateur extends Utilisateur {
 
     // Champs privés
-    private String typeClient;    // "particulier", "universitaire", "entreprise"
-    private String organisation;
-    private List<Mission> missions;
-    private double solde;         // en Dinar Tunisien (DT)
+    private int nbValidationsEffectuees;
+    private int nbAvisModeres;
 
     // Constructeur vide
-    public Client() {
+    public Administrateur() {
         super();
-        this.missions = new ArrayList<>();
-        this.solde = 0.0;
-        setTypeRole("client");
+        setTypeRole("admin");
+        setStatut("actif");
+        this.nbValidationsEffectuees = 0;
+        this.nbAvisModeres = 0;
     }
 
     // Constructeur complet
-    public Client(int id, String nom, String prenom, String email,
-                  String motDePasse, String typeClient, String organisation, double solde) {
-        super(id, nom, prenom, email, motDePasse, "client");
-        this.typeClient = typeClient;
-        this.organisation = organisation;
-        this.missions = new ArrayList<>();
-        this.solde = solde;
+    public Administrateur(int id, String nom, String prenom, String email, String motDePasse) {
+        super(id, nom, prenom, email, motDePasse, "admin");
+        setStatut("actif");
+        this.nbValidationsEffectuees = 0;
+        this.nbAvisModeres = 0;
     }
 
     // Méthodes métier
 
     /**
-     * Publier une nouvelle mission sur la plateforme.
+     * Valider ou rejeter un compte étudiant en attente.
      */
-    public Mission publierMission(int id, String titre, String description,
-                                  double budget, String delai, String domaine) {
-        if (titre == null || titre.isEmpty()) {
-            System.out.println("  ? Erreur : Le titre de la mission est obligatoire.");
-            return null;
+    public void validerCompte(Utilisateur utilisateur, boolean accepter, String motif) {
+        if (!utilisateur.getStatut().equals("en_attente")) {
+            System.out.println("  ??  Le compte de " + utilisateur.getPrenom() + " n'est pas en attente de validation.");
+            return;
         }
-        if (budget <= 0) {
-            System.out.println("  ? Erreur : Le budget doit être positif.");
-            return null;
+        if (accepter) {
+            utilisateur.setStatut("actif");
+            nbValidationsEffectuees++;
+            System.out.println("  ? Compte de " + utilisateur.getPrenom() + " " + utilisateur.getNom() + " validé.");
+            System.out.println("  ?? Notification envoyée : compte activé avec succès.");
+        } else {
+            utilisateur.setStatut("rejeté");
+            System.out.println("  ? Compte de " + utilisateur.getPrenom() + " " + utilisateur.getNom()
+                    + " rejeté. Motif : " + motif);
+            System.out.println("  ?? Notification d'envoyée à l'utilisateur.");
         }
-        Mission m = new Mission(id, titre, description, budget, delai, domaine, this);
-        missions.add(m);
-        System.out.println("  ? Mission \"" + titre + "\" créée avec succès. En attente de validation admin.");
-        System.out.println("  ?? Budget : " + budget + " DT | Délai : " + delai);
-        return m;
     }
 
     /**
-     * Consulter l'historique des missions du client.
+     * Valider une mission soumise par un client.
      */
-    public void consulterMissions() {
-        System.out.println("  ?? Missions du client " + getPrenom() + " " + getNom() + " :");
-        if (missions.isEmpty()) {
-            System.out.println("  ? Aucune mission publiée.");
+    public void validerMission(Mission mission) {
+        if (mission == null) {
+            System.out.println("  ? Mission introuvable.");
             return;
         }
+        mission.activer();
+        System.out.println("  ? Mission \"" + mission.getTitre() + "\" validée et publiée par l'admin.");
+    }
+
+    /**
+     * Modérer un avis signalé (le supprimer ou l'ignorer).
+     */
+    public void modererAvis(Avis avis, boolean supprimer) {
+        if (!avis.isSignale()) {
+            System.out.println("  ??  L'avis #" + avis.getId() + " n'a pas été signalé.");
+            return;
+        }
+        if (supprimer) {
+            nbAvisModeres++;
+            System.out.println("  ??  Avis #" + avis.getId() + " supprimé par l'administrateur.");
+        } else {
+            System.out.println("  ? Avis #" + avis.getId() + " examiné ? conservé sur la plateforme.");
+        }
+    }
+
+    /**
+     * Afficher les statistiques globales de la plateforme (tableau de bord).
+     */
+    public void afficherStatistiques(List<Utilisateur> utilisateurs,
+                                     List<Mission> missions,
+                                     double revenusJour) {
+        long nbEtudiants = utilisateurs.stream()
+                .filter(u -> u.getTypeRole().equals("etudiant")).count();
+        long nbClients = utilisateurs.stream()
+                .filter(u -> u.getTypeRole().equals("client")).count();
+        long nbEnAttente = utilisateurs.stream()
+                .filter(u -> u.getStatut().equals("en_attente")).count();
+        long nbMissionsActives = missions.stream()
+                .filter(m -> m.getStatut().equals("active") || m.getStatut().equals("en_cours")).count();
+        long nbMissionsTerminees = missions.stream()
+                .filter(m -> m.getStatut().equals("terminée")).count();
+
+        System.out.println("  ???????????????????????????????????????????");
+        System.out.println("  ?  ?? TABLEAU DE BORD ADMINISTRATEUR");
+        System.out.println("  ???????????????????????????????????????????");
+        System.out.println("  ?  ?? Utilisateurs inscrits : " + utilisateurs.size());
+        System.out.println("  ?     ?? Étudiants freelances : " + nbEtudiants);
+        System.out.println("  ?     ?? Clients             : " + nbClients);
+        System.out.println("  ?  ? Comptes en attente de validation : " + nbEnAttente);
+        System.out.println("  ?");
+        System.out.println("  ?  ?? Missions actives  : " + nbMissionsActives);
+        System.out.println("  ?  ?? Missions terminées: " + nbMissionsTerminees);
+        System.out.println("  ?  ?? Revenus du jour   : " + revenusJour + " DT");
+        System.out.println("  ?");
+        System.out.println("  ?  ? Validations effectuées : " + nbValidationsEffectuees);
+        System.out.println("  ?  ?? Avis modérés          : " + nbAvisModeres);
+        System.out.println("  ???????????????????????????????????????????");
+
+        // Alertes automatiques
+        genererAlertes(missions);
+    }
+
+    /**
+     * Générer des alertes pour les anomalies détectées.
+     */
+    public void genererAlertes(List<Mission> missions) {
+        boolean alerteGeneree = false;
         for (Mission m : missions) {
-            System.out.println("  ? - " + m.getTitre() + " | Budget : " + m.getBudget() + " DT | Statut : " + m.getStatut());
+            if (m.getStatut().equals("active") && m.getCandidatures().isEmpty()) {
+                System.out.println("  ??  ALERTE : Mission \"" + m.getTitre() + "\" active sans aucune candidature.");
+                alerteGeneree = true;
+            }
+        }
+        if (!alerteGeneree) {
+            System.out.println("  ? Aucune anomalie détectée.");
         }
     }
 
     /**
-     * Modifier une mission existante (seulement si aucune candidature n'est acceptée).
+     * Afficher la liste des comptes en attente de validation.
      */
-    public boolean modifierMission(Mission mission, String nouveauTitre, double nouveauBudget) {
-        if (mission == null) {
-            System.out.println("  ? Mission introuvable.");
-            return false;
+    public void afficherComptesEnAttente(List<Utilisateur> utilisateurs) {
+        System.out.println("  ?? Comptes en attente de validation :");
+        boolean trouve = false;
+        for (Utilisateur u : utilisateurs) {
+            if (u.getStatut().equals("en_attente")) {
+                System.out.println("  ? " + u.getPrenom() + " " + u.getNom() + " [" + u.getTypeRole() + "] | " + u.getEmail());
+                trouve = true;
+            }
         }
-        if (mission.isUneCandiatureAcceptee()) {
-            System.out.println("  ? Impossible de modifier : une candidature a déjà été acceptée.");
-            return false;
-        }
-        mission.setTitre(nouveauTitre);
-        mission.setBudget(nouveauBudget);
-        System.out.println("  ? Mission modifiée : \"" + nouveauTitre + "\" ? " + nouveauBudget + " DT");
-        return true;
+        if (!trouve) System.out.println("  ? Aucun compte en attente.");
     }
 
     /**
-     * Fermer une mission et notifier les candidats.
+     * Consulter le tableau de bord admin.
      */
-    public void fermerMission(Mission mission) {
-        if (mission == null) {
-            System.out.println("  ? Mission introuvable.");
-            return;
-        }
-        mission.setStatut("fermée");
-        System.out.println("  ?? Mission \"" + mission.getTitre() + "\" fermée.");
-        System.out.println("  ?? " + mission.getCandidatures().size() + " candidat(s) notifié(s) de la fermeture.");
-    }
-
-    /**
-     * Sélectionner un candidat pour une mission.
-     */
-    public void selectionnerCandidat(Mission mission, Candidature candidature) {
-        if (mission == null || candidature == null) {
-            System.out.println("  ? Données invalides.");
-            return;
-        }
-        candidature.setStatut("acceptée");
-        mission.setCandidatureAcceptee(true);
-        mission.setStatut("en_cours");
-        System.out.println("  ? Candidature de " + candidature.getEtudiant().getPrenom()
-                + " " + candidature.getEtudiant().getNom() + " acceptée pour la mission \""
-                + mission.getTitre() + "\".");
-    }
-
-    /**
-     * Accepter la candidature d'un étudiant pour une mission.
-     */
-    public void accepterCandidature(Candidature candidature, Mission mission) {
-        candidature.setStatut("acceptée");
-        mission.setCandidatureAcceptee(true);
-        System.out.println("  ? Candidature de " + candidature.getEtudiant().getPrenom() + " acceptée pour \"" + mission.getTitre() + "\".");
-        System.out.println("  ?? Notification envoyée à l'étudiant.");
-    }
-
-    /**
-     * Refuser la candidature d'un étudiant.
-     */
-    public void refuserCandidature(Candidature candidature) {
-        candidature.setStatut("refusée");
-        System.out.println("  ? Candidature refusée pour " + candidature.getEtudiant().getPrenom());
+    public void consulterTableauDeBord(List<Utilisateur> utilisateurs) {
+        System.out.println("  ??????????????????????????????????????????");
+        System.out.println("  ? ?? TABLEAU DE BORD ADMINISTRATEUR");
+        System.out.println("  ? ?? Nombre de comptes validés : " + nbValidationsEffectuees);
+        System.out.println("  ? ?? Nombre d'avis modérés : " + nbAvisModeres);
+        System.out.println("  ? ?? Total d'utilisateurs : " + utilisateurs.size());
+        System.out.println("  ??????????????????????????????????????????");
     }
 
     // Getters
-    public String getTypeClient() { return typeClient; }
-    public String getOrganisation() { return organisation; }
-    public List<Mission> getMissions() { return missions; }
-    public double getSolde() { return solde; }
+    public int getNbValidationsEffectuees() { return nbValidationsEffectuees; }
+    public int getNbAvisModeres() { return nbAvisModeres; }
 
     // Setters
-    public void setTypeClient(String typeClient) { this.typeClient = typeClient; }
-    public void setOrganisation(String organisation) { this.organisation = organisation; }
-    public void setMissions(List<Mission> missions) { this.missions = missions; }
-    public void setSolde(double solde) { this.solde = solde; }
+    public void setNbValidationsEffectuees(int nbValidationsEffectuees) { this.nbValidationsEffectuees = nbValidationsEffectuees; }
+    public void setNbAvisModeres(int nbAvisModeres) { this.nbAvisModeres = nbAvisModeres; }
 
     @Override
     public String toString() {
-        return "Client{nom=" + getNom() + ", type=" + typeClient + ", organisation=" + organisation
-                + ", missions=" + missions.size() + ", solde=" + solde + " DT}";
+        return "Administrateur{nom=" + getNom() + ", validations=" + nbValidationsEffectuees
+                + ", avis_moderes=" + nbAvisModeres + "}";
     }
 }
