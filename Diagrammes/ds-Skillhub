@@ -1,0 +1,66 @@
+sequenceDiagram
+
+
+    actor EF as Etudiant<br/>Freelance
+    participant UI as Interface<br/>UI
+    participant AUTH as Authentification<br/>(Zeineb)
+    participant MODEL as EtudiantFreelance
+    participant RECH as Recherche &<br/>Candidature (Yassmine)
+    participant MISS as Mission
+    participant CAND as Candidature
+
+    rect rgb(200, 220, 255)
+    note over EF,CAND: F1 — Inscription
+    EF->>UI: saisit (nom, email, motDePasse, rôle)
+    UI->>AUTH: sInscrire(nom, email, motDePasse)
+    AUTH->>MODEL: new EtudiantFreelance(id, nom, email, mdp, domaine)
+    MODEL-->>AUTH: etudiant créé
+    AUTH-->>UI: inscription réussie
+    UI-->>EF: redirection vers page connexion
+    end
+
+    rect rgb(200, 220, 255)
+    note over EF,CAND: F1 — Connexion
+    EF->>UI: saisit (email, motDePasse)
+    UI->>AUTH: seConnecter(email, motDePasse)
+    AUTH->>MODEL: vérifier identifiants
+    MODEL-->>AUTH: boolean true
+    alt Identifiants valides
+        AUTH-->>UI: session ouverte
+        UI-->>EF: accès tableau de bord
+    else Identifiants invalides
+        AUTH-->>UI: erreur authentification
+        UI-->>EF: message d'erreur
+    end
+    end
+
+    rect rgb(220, 255, 220)
+    note over EF,CAND: F3 — Recherche de missions
+    EF->>UI: saisit filtres (domaine, budgetMin, budgetMax, délai)
+    UI->>RECH: rechercherMissions(domaine, budgetMin, budgetMax)
+    RECH->>MISS: filtrerMissions(critères)
+    MISS-->>RECH: liste de missions correspondantes
+    RECH-->>UI: afficher résultats
+    loop Pour chaque mission affichée
+        EF->>UI: consulte les détails
+        UI->>MISS: afficherDetails()
+        MISS-->>UI: titre, description, budget, délai
+        UI-->>EF: affichage détail mission
+    end
+    end
+
+    rect rgb(255, 240, 200)
+    note over EF,CAND: F3 — Candidature
+    EF->>UI: clique "Postuler" + saisit lettre de motivation
+    UI->>RECH: postuler(missionId, lettre)
+    RECH->>CAND: new Candidature(id, lettre)
+    CAND->>MODEL: vérifier éligibilité
+    MODEL-->>CAND: éligible
+    opt Etudiant éligible
+        CAND->>MISS: mettreAJourStatut("en attente")
+        MISS-->>CAND: statut mis à jour
+        CAND-->>RECH: candidature soumise
+        RECH-->>UI: confirmation candidature
+        UI-->>EF: "Candidature envoyée avec succès"
+    end
+    end
