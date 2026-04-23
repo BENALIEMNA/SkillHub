@@ -1,0 +1,92 @@
+@startuml
+title SkillHub — Scénario Complet : Cycle de vie d'une mission
+
+actor "Yassmine\n(Étudiante)" as ETU
+actor "Fatma (Karray)\n(Cliente)" as CLI
+actor "Emna\n(Admin)" as ADM
+participant "Authentification\n(Zeineb)" as AUTH
+participant "GestionMissions\n(Fatma)" as MISS
+participant "Candidature\n(Yassmine)" as CAND
+participant "Notation\n(Wafa)" as NOTE
+participant "Admin Dashboard\n(Emna)" as DASH
+
+== Phase 1 : Inscription & Validation ==
+ETU -> AUTH : sInscrire("Yassmine", email, motDePasse)
+AUTH --> ETU : Compte créé [statut = en_attente]
+CLI -> AUTH : sInscrire("Fatma", email, motDePasse)
+AUTH --> CLI : Compte créé [statut = en_attente]
+ADM -> DASH : afficherComptesEnAttente()
+DASH --> ADM : [Yassmine, Fatma] en attente
+ADM -> DASH : validerCompte(yassmine, true)
+DASH -> AUTH : yassmine.setStatut("actif")
+AUTH --> ETU : Notification — compte activé ✅
+ADM -> DASH : validerCompte(fatma, true)
+DASH -> AUTH : fatma.setStatut("actif")
+
+== Phase 2 : Connexion ==
+ETU -> AUTH : seConnecter(email, motDePasse)
+alt email ou mot de passe incorrect
+  AUTH --> ETU : Erreur — identifiants invalides ❌
+else identifiants corrects
+  AUTH --> ETU : Connexion réussie ✅
+end
+CLI -> AUTH : seConnecter(email, motDePasse)
+AUTH --> CLI : Connexion réussie ✅
+
+== Phase 3 : Publication & Validation Mission ==
+CLI -> MISS : publierMission("Création logo", 150.0, "Design")
+alt budget <= 0 ou titre vide
+  MISS --> CLI : Erreur de validation ❌
+else données valides
+  MISS --> CLI : Mission créée [statut = en_attente] ⏳
+end
+ADM -> DASH : validerMission(mission1)
+DASH -> MISS : mission1.activer()
+MISS --> ADM : Mission [statut = active] ✅
+
+== Phase 4 : Recherche & Candidature ==
+ETU -> CAND : rechercherMissions("Design Graphique", 200.0)
+CAND --> ETU : [Mission #1 — logo — 150 DT — active]
+ETU -> CAND : postuler(mission1, lettre, 140.0)
+alt mission non active
+  CAND --> ETU : Erreur — mission fermée ❌
+else mission active
+  CAND -> MISS : mission1.ajouterCandidature(candidature1)
+  CAND --> ETU : Candidature envoyée ✅
+  CAND --> CLI : Notification — nouvelle candidature de Yassmine
+end
+
+== Phase 5 : Sélection du Candidat ==
+CLI -> MISS : selectionnerCandidat(mission1, candidature1)
+MISS -> CAND : candidature1.setStatut("acceptée")
+MISS -> MISS : mission1.setStatut("en_cours")
+MISS --> ETU : Notification — candidature acceptée ✅
+CLI -> MISS : modifierMission(mission1, nouveauTitre, 180.0)
+alt candidature déjà acceptée
+  MISS --> CLI : Erreur — modification impossible ❌
+end
+
+== Phase 6 : Livraison & Notation ==
+CLI -> MISS : mission1.terminer()
+MISS --> ETU : Mission [statut = terminée]
+CLI -> NOTE : ajouterAvis(5, "Excellent travail!", mission1)
+alt mission non terminée
+  NOTE --> CLI : Erreur — notation prématurée ❌
+else mission terminée
+  NOTE -> AUTH : yassmine.mettreAJourNote(5)
+  AUTH --> NOTE : Moyenne mise à jour : 5.0/5
+  NOTE --> CLI : Avis publié ✅
+end
+ETU -> NOTE : repondreAvis(avis1, "Merci !")
+NOTE --> ETU : Réponse enregistrée ✅
+
+== Phase 7 : Tableau de Bord Admin Final ==
+ADM -> DASH : afficherStatistiques(utilisateurs, missions, revenus)
+loop Pour chaque mission
+  DASH -> MISS : vérifier statut + candidatures
+  alt mission active sans candidature
+    DASH --> ADM : ⚠️ ALERTE — Mission sans candidats
+  end
+end
+DASH --> ADM : Dashboard : 6 utilisateurs | 4 missions | 115 DT commissions
+@enduml
