@@ -1,0 +1,92 @@
+@startuml
+left to right direction
+
+' ======================
+' ACTEURS (héritage)
+' ======================
+
+actor Utilisateur
+actor Etudiant
+actor Client
+actor Administrateur as Admin
+
+Etudiant --|> Utilisateur
+Client --|> Utilisateur
+Admin --|> Utilisateur
+
+rectangle "SkillHub System" {
+
+  ' ======================
+  ' F1 - Authentification
+  ' ======================
+  usecase "S'inscrire" as UC1
+  usecase "Se connecter" as UC2
+  usecase "Se déconnecter" as UC3
+
+  ' ======================
+  ' F2 - Gestion missions
+  ' ======================
+  usecase "Publier une mission" as UC4
+  usecase "Modifier une mission" as UC5
+  usecase "Fermer une mission" as UC6
+
+  ' ======================
+  ' F3 - Recherche & Candidature
+  ' ======================
+  usecase "Rechercher des missions" as UC7
+  usecase "Filtrer par domaine et budget" as UC8
+  usecase "Postuler à une mission" as UC9
+
+  ' ======================
+  ' F4 - Notation & Avis
+  ' ======================
+  usecase "Noter un utilisateur" as UC10
+  usecase "Consulter ses avis" as UC11
+  usecase "Signaler un avis" as UC12
+
+  ' ======================
+  ' F5 - Admin Dashboard
+  ' ======================
+  usecase "Valider un compte utilisateur" as UC13
+  usecase "Rejeter un compte utilisateur" as UC14
+  usecase "Consulter tableau de bord" as UC15
+  usecase "Générer une alerte" as UC16
+}
+
+' ======================
+' RELATIONS
+' ======================
+
+Utilisateur --> UC2
+Utilisateur --> UC3
+
+Etudiant --> UC1
+Etudiant --> UC7
+Etudiant --> UC8
+Etudiant --> UC9
+Etudiant --> UC11
+Etudiant --> UC12
+
+Client --> UC1
+Client --> UC4
+Client --> UC5
+Client --> UC6
+Client --> UC10
+
+Admin --> UC13
+Admin --> UC14
+Admin --> UC15
+Admin --> UC16
+
+' ======================
+' include / extend
+' ======================
+
+UC8 ..> UC7 : <<include>>
+UC9 ..> UC7 : <<include>>
+UC5 ..> UC4 : <<extend>>
+UC6 ..> UC4 : <<extend>>
+UC14 ..> UC13 : <<extend>>
+UC16 ..> UC15 : <<include>>
+
+@enduml
