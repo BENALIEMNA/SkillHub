@@ -109,9 +109,4 @@ public class EtudiantFreelance extends Utilisateur {
     public void setCompetences(List<String> competences) { this.competences = competences; }
     public void setCandidatures(List<Candidature> candidatures) { this.candidatures = candidatures; }
 
-    @Override
-    public String toString() {
-        return "EtudiantFreelance{nom=" + getNom() + ", domaine=" + domaine + ", universite=" + universite
-                + ", moyenne=" + noteMoyenne + ", candidatures=" + candidatures.size() + "}";
-    }
-}
+  
