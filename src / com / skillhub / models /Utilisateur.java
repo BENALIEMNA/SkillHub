@@ -105,10 +105,5 @@ public abstract class Utilisateur {
     public void setStatut(String statut) { this.statut = statut; }
     public void setTypeRole(String typeRole) { this.typeRole = typeRole; }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{id=" + id + ", nom=" + nom + ", prenom=" + prenom
-                + ", email=" + email + ", statut=" + statut + ", role=" + typeRole + "}";
-    }
-}
+    
 
