@@ -513,7 +513,72 @@ public class Main {
     }
 
     private static void rateAndCompleteMission(Client client) {
-        // ...existing code...
+        List<Mission> clientMissions = client.getMissions();
+        List<Mission> activeOrInProgressMissions = new ArrayList<>();
+        
+        for (Mission m : clientMissions) {
+            if ("active".equals(m.getStatut()) || "en_cours".equals(m.getStatut())) {
+                activeOrInProgressMissions.add(m);
+            }
+        }
+        
+        if (activeOrInProgressMissions.isEmpty()) {
+            System.out.println("\nNo active or in-progress missions to complete.");
+            return;
+        }
+        
+        System.out.println("\n--- Missions to Complete ---");
+        for (int i = 0; i < activeOrInProgressMissions.size(); i++) {
+            Mission m = activeOrInProgressMissions.get(i);
+            System.out.println((i + 1) + ". " + m.getTitre() + " - Status: " + m.getStatut());
+        }
+        
+        System.out.print("\nSelect mission (0 to cancel): ");
+        int missionChoice = getIntInput();
+        if (missionChoice <= 0 || missionChoice > activeOrInProgressMissions.size()) return;
+        
+        Mission mission = activeOrInProgressMissions.get(missionChoice - 1);
+        
+        // Mark mission as complete
+        mission.setStatut("terminée");
+        System.out.println("\n✓ Mission marked as completed!");
+        
+        // Rate the selected student
+        if (mission.getCandidatures().isEmpty()) {
+            System.out.println("No students assigned to this mission.");
+            return;
+        }
+        
+        List<Candidature> acceptedCandidatures = new ArrayList<>();
+        for (Candidature c : mission.getCandidatures()) {
+            if ("acceptée".equals(c.getStatut())) {
+                acceptedCandidatures.add(c);
+            }
+        }
+        
+        if (acceptedCandidatures.isEmpty()) {
+            System.out.println("No accepted candidates for this mission.");
+            return;
+        }
+        
+        System.out.println("\n--- Rate Student ---");
+        Candidature accepted = acceptedCandidatures.get(0);
+        System.out.print("Rating (1-5 stars): ");
+        int rating = getIntInput();
+        
+        if (rating < 1 || rating > 5) {
+            System.out.println("Invalid rating.");
+            return;
+        }
+        
+        System.out.print("Review comment: ");
+        String comment = scanner.nextLine().trim();
+        
+        Avis review = new Avis(reviews.size() + 1, rating, comment, client, accepted.getEtudiant(), mission);
+        if (review.ajouterAvis()) {
+            reviews.add(review);
+            System.out.println("\n✓ Review published successfully!");
+        }
     }
 
     private static void displayAdminStatistics(Administrateur admin) {
