@@ -1,4 +1,4 @@
-package com.skillhub.models;
+import com.skillhub.models.*;
 
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -16,8 +16,17 @@ public class Main {
     private static Utilisateur currentUser = null;
 
     public static void main(String[] args) {
+        initData();
         displayWelcome();
         mainMenu();
+    }
+
+    // Initialise quelques données utiles (compte administrateur par défaut)
+    private static void initData() {
+        // Crée un administrateur par défaut (email: admin@skillhub.com / mdp: admin123)
+        Administrateur admin = new Administrateur(0, "Admin", "SkillHub", "admin@skillhub.com", "admin123");
+        admin.setStatut("actif");
+        users.add(admin);
     }
 
     private static void displayWelcome() {
@@ -103,8 +112,11 @@ public class Main {
         EtudiantFreelance student = new EtudiantFreelance(id, nom, prenom, email, password, domain, university, year);
 
         if (student.sInscrire(nom, prenom, email, password)) {
+            // Pour le développement, on peut garder les comptes en attente pour tester l'admin
+            // student.setStatut("actif");
+
             users.add(student);
-            System.out.println("\nRegistration successful! Your account is pending admin approval.");
+            System.out.println("\nRegistration successful! Your account is now pending admin approval.");
             System.out.println("You will receive a confirmation email at: " + email);
         }
     }
@@ -129,8 +141,11 @@ public class Main {
         Client client = new Client(id, nom, prenom, email, password, clientType, organization, 0.0);
 
         if (client.sInscrire(nom, prenom, email, password)) {
+            // Pour le développement, on peut garder les comptes en attente pour tester l'admin
+            // client.setStatut("actif");
+
             users.add(client);
-            System.out.println("\nRegistration successful! Your account is pending admin approval.");
+            System.out.println("\nRegistration successful! Your account is now pending admin approval.");
         }
     }
 
@@ -164,6 +179,8 @@ public class Main {
             studentMenu((EtudiantFreelance) currentUser);
         } else if (currentUser instanceof Client) {
             clientMenu((Client) currentUser);
+        } else if (currentUser instanceof Administrateur) {
+            adminMenu((Administrateur) currentUser);
         }
     }
 
@@ -175,7 +192,8 @@ public class Main {
             System.out.println("2. Add Skill");
             System.out.println("3. Search Missions");
             System.out.println("4. View My Applications");
-            System.out.println("5. Logout");
+            System.out.println("5. View Notifications");
+            System.out.println("6. Logout");
             System.out.print("Choose: ");
 
             int choice = getIntInput();
@@ -193,6 +211,9 @@ public class Main {
                     viewApplications(student);
                     break;
                 case 5:
+                    student.consulterNotifications();
+                    break;
+                case 6:
                     currentUser.seDeconnecter();
                     currentUser = null;
                     inMenu = false;
@@ -210,7 +231,10 @@ public class Main {
             System.out.println("1. View Profile");
             System.out.println("2. Publish Mission");
             System.out.println("3. View My Missions");
-            System.out.println("4. Logout");
+            System.out.println("4. Select Candidate");
+            System.out.println("5. Rate Student & Complete Mission");
+            System.out.println("6. View Notifications");
+            System.out.println("7. Logout");
             System.out.print("Choose: ");
 
             int choice = getIntInput();
@@ -225,6 +249,15 @@ public class Main {
                     client.consulterMissions();
                     break;
                 case 4:
+                    selectCandidate(client);
+                    break;
+                case 5:
+                    rateAndCompleteMission(client);
+                    break;
+                case 6:
+                    client.consulterNotifications();
+                    break;
+                case 7:
                     currentUser.seDeconnecter();
                     currentUser = null;
                     inMenu = false;
@@ -233,6 +266,122 @@ public class Main {
                     System.out.println("Invalid option.");
             }
         }
+    }
+
+    // Menu administrateur : approuver comptes et missions
+    private static void adminMenu(Administrateur admin) {
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\n--- Administrateur Menu ---");
+            System.out.println("1. Voir comptes en attente");
+            System.out.println("2. Approuver/Rejeter un compte");
+            System.out.println("3. Voir missions en attente");
+            System.out.println("4. Approuver une mission");
+            System.out.println("5. Consulter tableau de bord");
+            System.out.println("6. Logout");
+            System.out.print("Choose: ");
+
+            int choice = getIntInput();
+            switch (choice) {
+                case 1:
+                    afficherComptesEnAttente();
+                    break;
+                case 2:
+                    traiterCompte(admin);
+                    break;
+                case 3:
+                    afficherMissionsEnAttente();
+                    break;
+                case 4:
+                    traiterMission(admin);
+                    break;
+                case 5:
+                    displayAdminStatistics(admin);
+                    break;
+                case 6:
+                    currentUser.seDeconnecter();
+                    currentUser = null;
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    // Affiche les comptes dont le statut est 'en_attente'
+    private static void afficherComptesEnAttente() {
+        System.out.println("\n-- Comptes en attente --");
+        int index = 1;
+        for (Utilisateur u : users) {
+            if ("en_attente".equals(u.getStatut())) {
+                System.out.println(index + ". [id=" + u.getId() + "] " + u.getPrenom() + " " + u.getNom() + " (" + u.getTypeRole() + ") - " + u.getEmail());
+                index++;
+            }
+        }
+        if (index == 1) System.out.println("Aucun compte en attente.");
+    }
+
+    // Traiter (approuver ou rejeter) un compte
+    private static void traiterCompte(Administrateur admin) {
+        System.out.println("\nChoisissez l'id de l'utilisateur à traiter (ou 0 pour annuler):");
+        // Liste les utilisateurs avec leur id
+        for (Utilisateur u : users) {
+            System.out.println("[id=" + u.getId() + "] " + u.getPrenom() + " " + u.getNom() + " - statut: " + u.getStatut());
+        }
+        int id = getIntInput();
+        if (id <= 0) return;
+        Utilisateur cible = null;
+        for (Utilisateur u : users) {
+            if (u.getId() == id) { cible = u; break; }
+        }
+        if (cible == null) {
+            System.out.println("Utilisateur introuvable.");
+            return;
+        }
+        System.out.println("1. Approuver\n2. Rejeter\nChoose: ");
+        int choix = getIntInput();
+        if (choix == 1) {
+            admin.validerCompte(cible, true, null);
+        } else if (choix == 2) {
+            System.out.print("Motif du rejet: ");
+            String motif = scanner.nextLine().trim();
+            admin.validerCompte(cible, false, motif);
+        } else {
+            System.out.println("Option invalide.");
+        }
+    }
+
+    // Affiche missions en attente
+    private static void afficherMissionsEnAttente() {
+        System.out.println("\n-- Missions en attente --");
+        int index = 1;
+        for (Mission m : missions) {
+            if ("en_attente".equals(m.getStatut())) {
+                System.out.println(index + ". [id=" + m.getId() + "] " + m.getTitre() + " - " + m.getDomaine() + " - " + m.getClient().getPrenom());
+                index++;
+            }
+        }
+        if (index == 1) System.out.println("Aucune mission en attente.");
+    }
+
+    // Traiter (approuver) une mission
+    private static void traiterMission(Administrateur admin) {
+        System.out.println("\nChoisissez l'id de la mission à approuver (ou 0 pour annuler):");
+        for (Mission m : missions) {
+            System.out.println("[id=" + m.getId() + "] " + m.getTitre() + " - statut: " + m.getStatut());
+        }
+        int id = getIntInput();
+        if (id <= 0) return;
+        Mission cible = null;
+        for (Mission m : missions) {
+            if (m.getId() == id) { cible = m; break; }
+        }
+        if (cible == null) {
+            System.out.println("Mission introuvable.");
+            return;
+        }
+        admin.validerMission(cible);
     }
 
     private static void addSkill(EtudiantFreelance student) {
@@ -321,6 +470,104 @@ public class Main {
             missions.add(mission);
             System.out.println("\nMission published successfully! Awaiting admin approval.");
         }
+    }
+
+    private static void selectCandidate(Client client) {
+        List<Mission> clientMissions = client.getMissions();
+        if (clientMissions.isEmpty()) {
+            System.out.println("\nYou have no missions.");
+            return;
+        }
+        
+        System.out.println("\n--- Your Missions ---");
+        for (int i = 0; i < clientMissions.size(); i++) {
+            Mission m = clientMissions.get(i);
+            System.out.println((i + 1) + ". " + m.getTitre() + " [" + m.getCandidatures().size() + " candidatures] - Status: " + m.getStatut());
+        }
+        
+        System.out.print("\nSelect mission (0 to cancel): ");
+        int missionChoice = getIntInput();
+        if (missionChoice <= 0 || missionChoice > clientMissions.size()) return;
+        
+        Mission mission = clientMissions.get(missionChoice - 1);
+        List<Candidature> candidatures = mission.getCandidatures();
+        
+        if (candidatures.isEmpty()) {
+            System.out.println("\nNo applications for this mission.");
+            return;
+        }
+        
+        System.out.println("\n--- Candidates for \"" + mission.getTitre() + "\" ---");
+        for (int i = 0; i < candidatures.size(); i++) {
+            Candidature c = candidatures.get(i);
+            System.out.println((i + 1) + ". " + c.getEtudiant().getPrenom() + " " + c.getEtudiant().getNom() 
+                    + " - Proposed: " + c.getPropositionBudget() + " DT - Status: " + c.getStatut());
+        }
+        
+        System.out.print("\nSelect candidate (0 to cancel): ");
+        int candChoice = getIntInput();
+        if (candChoice <= 0 || candChoice > candidatures.size()) return;
+        
+        Candidature selected = candidatures.get(candChoice - 1);
+        client.selectionnerCandidat(mission, selected);
+    }
+
+    private static void rateAndCompleteMission(Client client) {
+        // ...existing code...
+    }
+
+    private static void displayAdminStatistics(Administrateur admin) {
+        System.out.println("\n=============================================");
+        System.out.println("   TABLEAU DE BORD ADMINISTRATEUR");
+        System.out.println("=============================================");
+        
+        // User statistics
+        long nbEtudiants = users.stream().filter(u -> u.getTypeRole().equals("etudiant")).count();
+        long nbClients = users.stream().filter(u -> u.getTypeRole().equals("client")).count();
+        long nbEnAttente = users.stream().filter(u -> u.getStatut().equals("en_attente")).count();
+        
+        System.out.println("\n📊 UTILISATEURS:");
+        System.out.println("   Total: " + users.size() + " | Étudiants: " + nbEtudiants + " | Clients: " + nbClients);
+        System.out.println("   En attente de validation: " + nbEnAttente);
+        
+        // Mission statistics
+        long nbMissionsActives = missions.stream().filter(m -> m.getStatut().equals("active")).count();
+        long nbMissionsEnCours = missions.stream().filter(m -> m.getStatut().equals("en_cours")).count();
+        long nbMissionsTerminees = missions.stream().filter(m -> m.getStatut().equals("terminée")).count();
+        long nbMissionsEnAttente = missions.stream().filter(m -> m.getStatut().equals("en_attente")).count();
+        double totalBudgetMissions = missions.stream().mapToDouble(Mission::getBudget).sum();
+        double revenusCommission = Math.round(totalBudgetMissions * 0.05 * 100.0) / 100.0; // 5% commission
+        
+        System.out.println("\n📋 MISSIONS:");
+        System.out.println("   Total: " + missions.size());
+        System.out.println("   Actives: " + nbMissionsActives + " | En cours: " + nbMissionsEnCours + " | Terminées: " + nbMissionsTerminees);
+        System.out.println("   En attente: " + nbMissionsEnAttente);
+        System.out.println("   Budget total: " + totalBudgetMissions + " DT");
+        System.out.println("   Commissions (5%): " + revenusCommission + " DT");
+        
+        // Reviews statistics
+        long nbAvisPublies = reviews.size();
+        System.out.println("\n⭐ AVIS & ÉVALUATIONS:");
+        System.out.println("   Total: " + nbAvisPublies);
+        
+        System.out.println("\n👤 ADMIN:");
+        System.out.println("   Validations effectuées: " + admin.getNbValidationsEffectuees());
+        System.out.println("   Avis modérés: " + admin.getNbAvisModeres());
+        
+        // Alerts
+        System.out.println("\n⚠️  ALERTES:");
+        boolean alerteGeneree = false;
+        for (Mission m : missions) {
+            if (m.getStatut().equals("active") && m.getCandidatures().isEmpty()) {
+                System.out.println("   🔔 Mission \"" + m.getTitre() + "\" active sans candidatures");
+                alerteGeneree = true;
+            }
+        }
+        if (!alerteGeneree) {
+            System.out.println("   ✅ Aucune anomalie détectée");
+        }
+        
+        System.out.println("\n=============================================\n");
     }
 
     private static int getIntInput() {
