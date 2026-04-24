@@ -35,31 +35,35 @@ public class Candidature {
 
     // Méthodes métier
 
-    /**
-     * Postuler à une mission : valide et enregistre la candidature.
-     */
-    public boolean postuler() {
-        if (etudiant == null || mission == null) {
-            System.out.println("  ? Données manquantes pour la candidature.");
-            return false;
-        }
-        if (!mission.getStatut().equals("active")) {
-            System.out.println("  ? La mission \"" + mission.getTitre() + "\" n'est pas ouverte aux candidatures.");
-            return false;
-        }
-        mission.ajouterCandidature(this);
-        etudiant.getCandidatures().add(this);
-        System.out.println("  ? Candidature envoyée pour la mission \"" + mission.getTitre() + "\".");
-        System.out.println("  ?? Le client " + mission.getClient().getPrenom() + " " + mission.getClient().getNom() + " a été notifié.");
-        return true;
-    }
+     /**
+      * Postuler à une mission : valide et enregistre la candidature.
+      */
+     public boolean postuler() {
+         if (etudiant == null || mission == null) {
+             System.out.println("  ▸ Données manquantes pour la candidature.");
+             return false;
+         }
+         if (!mission.getStatut().equals("active")) {
+             System.out.println("  ▸ La mission \"" + mission.getTitre() + "\" n'est pas ouverte aux candidatures.");
+             return false;
+         }
+         mission.ajouterCandidature(this);
+         etudiant.getCandidatures().add(this);
+         mission.getClient().ajouterNotification(
+                 "Nouvelle candidature pour '" + mission.getTitre() + "' par "
+                         + etudiant.getPrenom() + " " + etudiant.getNom() + "."
+         );
+         System.out.println("  ▸ Candidature envoyée pour la mission \"" + mission.getTitre() + "\".");
+         System.out.println("  ✓ Le client " + mission.getClient().getPrenom() + " " + mission.getClient().getNom() + " a été notifié.");
+         return true;
+     }
 
-    /**
-     * Afficher le statut de la candidature.
-     */
-    public void afficherStatut() {
-        System.out.println("  ?? Candidature #" + id + " pour \"" + mission.getTitre() + "\" ? Statut : " + statut);
-    }
+     /**
+      * Afficher le statut de la candidature.
+      */
+     public void afficherStatut() {
+         System.out.println("  ✓ Candidature #" + id + " pour \"" + mission.getTitre() + "\" — Statut : " + statut);
+     }
 
     /**
      * Rechercher des missions filtrées par domaine et budget maximum.
@@ -95,8 +99,9 @@ public class Candidature {
     public void setStatut(String statut) { this.statut = statut; }
     public void setPropositionBudget(double propositionBudget) { this.propositionBudget = propositionBudget; }
 
-    @Override
-    public String toString() {
-        return "Candidature{#" + id + " | " + etudiant.getPrenom() + " ? " + mission.getTitre() + " | " + statut + "}";
-    }
+     @Override
+     public String toString() {
+         return "Candidature{#" + id + " | " + etudiant.getPrenom() + " — " + mission.getTitre() + " | " + statut + "}";
+     }
 }
+
