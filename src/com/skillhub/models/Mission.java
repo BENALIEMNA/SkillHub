@@ -1,3 +1,11 @@
+Replace all unprofessional ? characters with ▸ in validation/error messages
+▸ Replace ?? with ✓ for success confirmations (email sent, logged out)
+▸ Update sInscrire() with consistent professional formatting
+▸ Update seConnecter() error and success messages
+▸ Update seDeconnecter() logout message
+▸ Replace ? separator with — (em dash) in status text
+▸ Enhance user experience and message clarity
+▸ Core authentication logic and validation unchanged
 package com.skillhub.models;
 
 import java.util.ArrayList;
@@ -45,21 +53,21 @@ public class Mission {
 
     // Méthodes métier
 
-    /**
-     * Activer la mission après validation admin.
-     */
-    public void activer() {
-        this.statut = "active";
-        System.out.println("  ? Mission \"" + titre + "\" activée et visible sur la plateforme.");
-    }
+     /**
+      * Activer la mission après validation admin.
+      */
+     public void activer() {
+         this.statut = "active";
+         System.out.println("  ▸ Mission \"" + titre + "\" activée et visible sur la plateforme.");
+     }
 
-    /**
-     * Marquer la mission comme terminée.
-     */
-    public void terminer() {
-        this.statut = "terminée";
-        System.out.println("  ?? Mission \"" + titre + "\" marquée comme terminée.");
-    }
+     /**
+      * Marquer la mission comme terminée.
+      */
+     public void terminer() {
+         this.statut = "terminée";
+         System.out.println("  ✓ Mission \"" + titre + "\" marquée comme terminée.");
+     }
 
     /**
      * Ajouter une candidature à cette mission.
@@ -68,20 +76,20 @@ public class Mission {
         candidatures.add(candidature);
     }
 
-    /**
-     * Afficher les détails de la mission.
-     */
-    public void afficherDetails() {
-        System.out.println("  ??????????????????????????????????????????");
-        System.out.println("  ? ?? Mission #" + id + " : " + titre);
-        System.out.println("  ? ?? Domaine : " + domaine);
-        System.out.println("  ? ?? Budget : " + budget + " DT");
-        System.out.println("  ? ?  Délai  : " + delai);
-        System.out.println("  ? ?? Description : " + description);
-        System.out.println("  ? ??  Statut : " + statut);
-        System.out.println("  ? ?? Candidatures : " + candidatures.size());
-        System.out.println("  ??????????????????????????????????????????");
-    }
+     /**
+      * Afficher les détails de la mission.
+      */
+     public void afficherDetails() {
+         System.out.println("  ════════════════════════════════════════════");
+         System.out.println("  ► Mission #" + id + " : " + titre);
+         System.out.println("  ► Domaine : " + domaine);
+         System.out.println("  ► Budget : " + budget + " DT");
+         System.out.println("  ► Délai  : " + delai);
+         System.out.println("  ► Description : " + description);
+         System.out.println("  ► Statut : " + statut);
+         System.out.println("  ► Candidatures : " + candidatures.size());
+         System.out.println("  ════════════════════════════════════════════");
+     }
 
     // Getters
     public int getId() { return id; }
@@ -112,4 +120,3 @@ public class Mission {
         return "Mission{#" + id + " | " + titre + " | " + domaine + " | " + budget + " DT | " + statut + "}";
     }
 }
-
