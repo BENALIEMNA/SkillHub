@@ -32,54 +32,54 @@ public class Administrateur extends Utilisateur {
 
     // Méthodes métier
 
-    /**
-     * Valider ou rejeter un compte étudiant en attente.
-     */
-    public void validerCompte(Utilisateur utilisateur, boolean accepter, String motif) {
-        if (!utilisateur.getStatut().equals("en_attente")) {
-            System.out.println("  ??  Le compte de " + utilisateur.getPrenom() + " n'est pas en attente de validation.");
-            return;
-        }
-        if (accepter) {
-            utilisateur.setStatut("actif");
-            nbValidationsEffectuees++;
-            System.out.println("  ? Compte de " + utilisateur.getPrenom() + " " + utilisateur.getNom() + " validé.");
-            System.out.println("  ?? Notification envoyée : compte activé avec succès.");
-        } else {
-            utilisateur.setStatut("rejeté");
-            System.out.println("  ? Compte de " + utilisateur.getPrenom() + " " + utilisateur.getNom()
-                    + " rejeté. Motif : " + motif);
-            System.out.println("  ?? Notification d'envoyée à l'utilisateur.");
-        }
-    }
+     /**
+      * Valider ou rejeter un compte étudiant en attente.
+      */
+     public void validerCompte(Utilisateur utilisateur, boolean accepter, String motif) {
+         if (!utilisateur.getStatut().equals("en_attente")) {
+             System.out.println("  ✓ Le compte de " + utilisateur.getPrenom() + " n'est pas en attente de validation.");
+             return;
+         }
+         if (accepter) {
+             utilisateur.setStatut("actif");
+             nbValidationsEffectuees++;
+             System.out.println("  ▸ Compte de " + utilisateur.getPrenom() + " " + utilisateur.getNom() + " validé.");
+             System.out.println("  ✓ Notification envoyée : compte activé avec succès.");
+         } else {
+             utilisateur.setStatut("rejeté");
+             System.out.println("  ▸ Compte de " + utilisateur.getPrenom() + " " + utilisateur.getNom()
+                     + " rejeté. Motif : " + motif);
+             System.out.println("  ✓ Notification d'envoyée à l'utilisateur.");
+         }
+     }
 
-    /**
-     * Valider une mission soumise par un client.
-     */
-    public void validerMission(Mission mission) {
-        if (mission == null) {
-            System.out.println("  ? Mission introuvable.");
-            return;
-        }
-        mission.activer();
-        System.out.println("  ? Mission \"" + mission.getTitre() + "\" validée et publiée par l'admin.");
-    }
+     /**
+      * Valider une mission soumise par un client.
+      */
+     public void validerMission(Mission mission) {
+         if (mission == null) {
+             System.out.println("  ▸ Mission introuvable.");
+             return;
+         }
+         mission.activer();
+         System.out.println("  ▸ Mission \"" + mission.getTitre() + "\" validée et publiée par l'admin.");
+     }
 
-    /**
-     * Modérer un avis signalé (le supprimer ou l'ignorer).
-     */
-    public void modererAvis(Avis avis, boolean supprimer) {
-        if (!avis.isSignale()) {
-            System.out.println("  ??  L'avis #" + avis.getId() + " n'a pas été signalé.");
-            return;
-        }
-        if (supprimer) {
-            nbAvisModeres++;
-            System.out.println("  ??  Avis #" + avis.getId() + " supprimé par l'administrateur.");
-        } else {
-            System.out.println("  ? Avis #" + avis.getId() + " examiné ? conservé sur la plateforme.");
-        }
-    }
+     /**
+      * Modérer un avis signalé (le supprimer ou l'ignorer).
+      */
+     public void modererAvis(Avis avis, boolean supprimer) {
+         if (!avis.isSignale()) {
+             System.out.println("  ✓ L'avis #" + avis.getId() + " n'a pas été signalé.");
+             return;
+         }
+         if (supprimer) {
+             nbAvisModeres++;
+             System.out.println("  ✓ Avis #" + avis.getId() + " supprimé par l'administrateur.");
+         } else {
+             System.out.println("  ▸ Avis #" + avis.getId() + " examiné — conservé sur la plateforme.");
+         }
+     }
 
     /**
      * Afficher les statistiques globales de la plateforme (tableau de bord).
@@ -118,48 +118,48 @@ public class Administrateur extends Utilisateur {
         genererAlertes(missions);
     }
 
-    /**
-     * Générer des alertes pour les anomalies détectées.
-     */
-    public void genererAlertes(List<Mission> missions) {
-        boolean alerteGeneree = false;
-        for (Mission m : missions) {
-            if (m.getStatut().equals("active") && m.getCandidatures().isEmpty()) {
-                System.out.println("  ??  ALERTE : Mission \"" + m.getTitre() + "\" active sans aucune candidature.");
-                alerteGeneree = true;
-            }
-        }
-        if (!alerteGeneree) {
-            System.out.println("  ? Aucune anomalie détectée.");
-        }
-    }
+     /**
+      * Générer des alertes pour les anomalies détectées.
+      */
+     public void genererAlertes(List<Mission> missions) {
+         boolean alerteGeneree = false;
+         for (Mission m : missions) {
+             if (m.getStatut().equals("active") && m.getCandidatures().isEmpty()) {
+                 System.out.println("  ✓ ALERTE : Mission \"" + m.getTitre() + "\" active sans aucune candidature.");
+                 alerteGeneree = true;
+             }
+         }
+         if (!alerteGeneree) {
+             System.out.println("  ▸ Aucune anomalie détectée.");
+         }
+     }
 
-    /**
-     * Afficher la liste des comptes en attente de validation.
-     */
-    public void afficherComptesEnAttente(List<Utilisateur> utilisateurs) {
-        System.out.println("  ?? Comptes en attente de validation :");
-        boolean trouve = false;
-        for (Utilisateur u : utilisateurs) {
-            if (u.getStatut().equals("en_attente")) {
-                System.out.println("  ? " + u.getPrenom() + " " + u.getNom() + " [" + u.getTypeRole() + "] | " + u.getEmail());
-                trouve = true;
-            }
-        }
-        if (!trouve) System.out.println("  ? Aucun compte en attente.");
-    }
+     /**
+      * Afficher la liste des comptes en attente de validation.
+      */
+     public void afficherComptesEnAttente(List<Utilisateur> utilisateurs) {
+         System.out.println("  ✓ Comptes en attente de validation :");
+         boolean trouve = false;
+         for (Utilisateur u : utilisateurs) {
+             if (u.getStatut().equals("en_attente")) {
+                 System.out.println("  ▸ " + u.getPrenom() + " " + u.getNom() + " [" + u.getTypeRole() + "] | " + u.getEmail());
+                 trouve = true;
+             }
+         }
+         if (!trouve) System.out.println("  ▸ Aucun compte en attente.");
+     }
 
-    /**
-     * Consulter le tableau de bord admin.
-     */
-    public void consulterTableauDeBord(List<Utilisateur> utilisateurs) {
-        System.out.println("  ??????????????????????????????????????????");
-        System.out.println("  ? ?? TABLEAU DE BORD ADMINISTRATEUR");
-        System.out.println("  ? ?? Nombre de comptes validés : " + nbValidationsEffectuees);
-        System.out.println("  ? ?? Nombre d'avis modérés : " + nbAvisModeres);
-        System.out.println("  ? ?? Total d'utilisateurs : " + utilisateurs.size());
-        System.out.println("  ??????????????????????????????????????????");
-    }
+     /**
+      * Consulter le tableau de bord admin.
+      */
+     public void consulterTableauDeBord(List<Utilisateur> utilisateurs) {
+         System.out.println("  ════════════════════════════════════════════");
+         System.out.println("  ► TABLEAU DE BORD ADMINISTRATEUR");
+         System.out.println("  ► Nombre de comptes validés : " + nbValidationsEffectuees);
+         System.out.println("  ► Nombre d'avis modérés : " + nbAvisModeres);
+         System.out.println("  ► Total d'utilisateurs : " + utilisateurs.size());
+         System.out.println("  ════════════════════════════════════════════");
+     }
 
     // Getters
     public int getNbValidationsEffectuees() { return nbValidationsEffectuees; }
