@@ -1,0 +1,98 @@
+classDiagram
+    class Utilisateur {
+        -int id
+        -String nom
+        -String email
+        -String motDePasse
+        -String statut
+        +Utilisateur()
+        +Utilisateur(id, nom, email, motDePasse)
+        +seConnecter(email, mdp) boolean
+        +seDeconnecter() void
+        +toString() String
+        +getId() int
+        +getNom() String
+        +getEmail() String
+        +setStatut(statut) void
+    }
+    class EtudiantFreelance {
+        -String competences
+        -String domaine
+        -double moyenneNotes
+        -int nbMissions
+        +EtudiantFreelance()
+        +EtudiantFreelance(id, nom, email, mdp, domaine)
+        +sInscrire() boolean
+        +afficherProfil() void
+        +getMoyenneNotes() double
+    }
+    class Client {
+        -String typeClient
+        -String organisation
+        +Client()
+        +Client(id, nom, email, mdp, organisation)
+        +publierMission(mission) boolean
+        +afficherMesMissions() void
+    }
+    class Administrateur {
+        -int niveauAcces
+        +Administrateur()
+        +Administrateur(id, nom, email, mdp)
+        +validerCompte(etudiant) boolean
+        +rejeterCompte(etudiant, motif) void
+        +afficherStatistiques() void
+        +genererAlerte(message) void
+    }
+    class Mission {
+        -int id
+        -String titre
+        -String description
+        -double budget
+        -String delai
+        -String domaine
+        -String statut
+        -String datePublication
+        +Mission()
+        +Mission(id, titre, description, budget, delai, domaine)
+        +publierMission() void
+        +modifierMission(titre, budget) void
+        +fermerMission() void
+        +afficherDetails() void
+        +toString() String
+    }
+    class Candidature {
+        -int id
+        -String lettre
+        -String statut
+        -String datePostulation
+        +Candidature()
+        +Candidature(id, lettre)
+        +postuler() boolean
+        +rechercherMissions(domaine, budgetMin, budgetMax) void
+        +mettreAJourStatut(statut) void
+        +afficherCandidature() void
+    }
+    class Avis {
+        -int id
+        -int note
+        -String commentaire
+        -String dateAvis
+        -boolean signale
+        +Avis()
+        +Avis(id, note, commentaire)
+        +ajouterAvis() void
+        +calculerMoyenne() double
+        +afficherAvis() void
+        +signalerAvis() void
+    }
+
+    Utilisateur <|-- EtudiantFreelance : herite
+    Utilisateur <|-- Client : herite
+    Utilisateur <|-- Administrateur : herite
+    Client "1" --> "0..*" Mission : publie
+    Mission "1" --> "0..*" Candidature : recoit
+    EtudiantFreelance "1" --> "0..*" Candidature : soumet
+    Client "1" --> "0..*" Avis : redige
+    Avis "0..*" --> "1" EtudiantFreelance : concerne
+    Administrateur "1" --> "0..*" Mission : modere
+    Administrateur "1" --> "0..*" EtudiantFreelance : valide

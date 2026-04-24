@@ -1,0 +1,55 @@
+package com.skillhub.models;
+
+/**
+ * Représente un étudiant sur la plateforme SkillHub.
+ * Hérite de Utilisateur.
+ * Responsable : Zeineb (Authentification)
+ */
+public class Etudiant extends Utilisateur {
+    private String competences;
+    private String domaine;
+    private double moyenneNotes;
+    private int nbMissions;
+
+    // Constructeur vide
+    public Etudiant() {
+        super();
+        this.competences = "";
+        this.domaine = "";
+        this.moyenneNotes = 0.0;
+        this.nbMissions = 0;
+        setTypeRole("etudiant");
+    }
+
+    // Constructeur complet
+    public Etudiant(int id, String nom, String prenom, String email, String motDePasse, String domaine) {
+        super(id, nom, prenom, email, motDePasse, "etudiant");
+        this.domaine = domaine;
+        this.moyenneNotes = 0.0;
+        this.nbMissions = 0;
+        this.competences = "";
+    }
+
+    @Override
+    public boolean seConnecter(String email, String motDePasse) {
+        return super.seConnecter(email, motDePasse);
+    }
+
+    public String getCompetences() { return competences; }
+    public void setCompetences(String competences) { this.competences = competences; }
+
+    public String getDomaine() { return domaine; }
+    public void setDomaine(String domaine) { this.domaine = domaine; }
+
+    public double getMoyenneNotes() { return moyenneNotes; }
+    public void setMoyenneNotes(double moyenneNotes) { this.moyenneNotes = moyenneNotes; }
+
+    public int getNbMissions() { return nbMissions; }
+    public void setNbMissions(int nbMissions) { this.nbMissions = nbMissions; }
+
+    @Override
+    public String toString() {
+        return "Etudiant{nom=" + getNom() + ", prenom=" + getPrenom() + ", domaine=" + domaine
+                + ", moyenne=" + moyenneNotes + ", missions=" + nbMissions + "}";
+    }
+}
