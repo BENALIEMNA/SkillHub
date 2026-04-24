@@ -1,5 +1,4 @@
 package com.skillhub.models;
-
 import java.util.ArrayList;
 import java.util.List;
 
