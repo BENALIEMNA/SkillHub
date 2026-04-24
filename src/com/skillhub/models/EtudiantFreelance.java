@@ -1,4 +1,5 @@
 package com.skillhub.models;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +18,14 @@ public class EtudiantFreelance extends Utilisateur {
     private int nbAvisRecus;
     private List<String> competences;
     private List<Candidature> candidatures;
+    private List<String> notifications;
 
     // Constructeur vide
     public EtudiantFreelance() {
         super();
         this.competences = new ArrayList<>();
         this.candidatures = new ArrayList<>();
+        this.notifications = new ArrayList<>();
         this.noteMoyenne = 0.0;
         this.nbAvisRecus = 0;
         setTypeRole("etudiant");
@@ -40,6 +43,7 @@ public class EtudiantFreelance extends Utilisateur {
         this.nbAvisRecus = 0;
         this.competences = new ArrayList<>();
         this.candidatures = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     // Méthodes métier
@@ -49,20 +53,44 @@ public class EtudiantFreelance extends Utilisateur {
      */
     public void ajouterCompetence(String competence) {
         competences.add(competence);
-        System.out.println("  ? Compétence \"" + competence + "\" ajoutée au profil.");
+        System.out.println("  ▸ Compétence \"" + competence + "\" ajoutée au profil.");
     }
 
     /**
      * Consulter les missions disponibles et postuler.
      */
     public void consulterMissions(List<Mission> missions) {
-        System.out.println("  ?? Missions disponibles pour " + getPrenom() + " " + getNom() + " :");
+        System.out.println("  ✓ Missions disponibles pour " + getPrenom() + " " + getNom() + " :");
         if (missions.isEmpty()) {
-            System.out.println("  ? Aucune mission disponible.");
+            System.out.println("  ▸ Aucune mission disponible.");
             return;
         }
         for (Mission m : missions) {
-            System.out.println("  ? - " + m.getTitre() + " | Budget : " + m.getBudget() + " DT | Domaine : " + m.getDomaine());
+            System.out.println("  ▸ - " + m.getTitre() + " | Budget : " + m.getBudget() + " DT | Domaine : " + m.getDomaine());
+        }
+    }
+
+    /**
+     * Ajouter une notification interne à l'étudiant.
+     */
+    public void ajouterNotification(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return;
+        }
+        notifications.add(message.trim());
+    }
+
+    /**
+     * Consulter les notifications reçues.
+     */
+    public void consulterNotifications() {
+        System.out.println("  ✓ Notifications de " + getPrenom() + " " + getNom() + " :");
+        if (notifications.isEmpty()) {
+            System.out.println("  ▸ Aucune notification.");
+            return;
+        }
+        for (int i = 0; i < notifications.size(); i++) {
+            System.out.println("  ▸ " + (i + 1) + ". " + notifications.get(i));
         }
     }
 
@@ -72,22 +100,22 @@ public class EtudiantFreelance extends Utilisateur {
     public void mettreAJourNote(int noteNouvelle) {
         nbAvisRecus++;
         noteMoyenne = Math.round(((noteMoyenne * (nbAvisRecus - 1)) + noteNouvelle) / nbAvisRecus * 10.0) / 10.0;
-        System.out.println("  ? Nouvelle note moyenne : " + noteMoyenne + " ⭐ (" + nbAvisRecus + " avis)");
+        System.out.println("  ▸ Nouvelle note moyenne : " + noteMoyenne + " ⭐ (" + nbAvisRecus + " avis)");
     }
 
     /**
      * Afficher le profil de l'étudiant freelance.
      */
     public void afficherProfil() {
-        System.out.println("  ??????????????????????????????????????????");
-        System.out.println("  ? ?? Profil : " + getPrenom() + " " + getNom());
-        System.out.println("  ? ?? Université : " + universite);
-        System.out.println("  ? ?? Niveau : " + niveauEtude);
-        System.out.println("  ? ?? Domaine : " + domaine);
-        System.out.println("  ? ?? Note moyenne : " + noteMoyenne + " ⭐ (" + nbAvisRecus + " avis)");
-        System.out.println("  ? ?? Compétences : " + competences);
-        System.out.println("  ? ?? Candidatures : " + candidatures.size());
-        System.out.println("  ??????????????????????????????????????????");
+        System.out.println("  ════════════════════════════════════════════");
+        System.out.println("  ► Profil : " + getPrenom() + " " + getNom());
+        System.out.println("  ► Université : " + universite);
+        System.out.println("  ► Niveau : " + niveauEtude);
+        System.out.println("  ► Domaine : " + domaine);
+        System.out.println("  ► Note moyenne : " + noteMoyenne + " ⭐ (" + nbAvisRecus + " avis)");
+        System.out.println("  ► Compétences : " + competences);
+        System.out.println("  ► Candidatures : " + candidatures.size());
+        System.out.println("  ════════════════════════════════════════════");
     }
 
     // Getters
@@ -98,6 +126,7 @@ public class EtudiantFreelance extends Utilisateur {
     public int getNbAvisRecus() { return nbAvisRecus; }
     public List<String> getCompetences() { return competences; }
     public List<Candidature> getCandidatures() { return candidatures; }
+    public List<String> getNotifications() { return notifications; }
 
     // Setters
     public void setDomaine(String domaine) { this.domaine = domaine; }
@@ -107,10 +136,12 @@ public class EtudiantFreelance extends Utilisateur {
     public void setNbAvisRecus(int nbAvisRecus) { this.nbAvisRecus = nbAvisRecus; }
     public void setCompetences(List<String> competences) { this.competences = competences; }
     public void setCandidatures(List<Candidature> candidatures) { this.candidatures = candidatures; }
+    public void setNotifications(List<String> notifications) { this.notifications = notifications; }
 
     @Override
     public String toString() {
         return "EtudiantFreelance{nom=" + getNom() + ", domaine=" + domaine + ", universite=" + universite
-                + ", moyenne=" + noteMoyenne + ", candidatures=" + candidatures.size() + "}";
+                + ", moyenne=" + noteMoyenne + ", candidatures=" + candidatures.size() 
+                + ", notifications=" + notifications.size() + "}";
     }
 }
