@@ -1,7 +1,9 @@
 import com.skillhub.models.*;
+
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Main application class for SkillHub platform
@@ -12,6 +14,7 @@ public class Main {
     private static List<Utilisateur> users = new ArrayList<>();
     private static List<Mission> missions = new ArrayList<>();
     private static List<Avis> reviews = new ArrayList<>();
+    private static List<Paiment> payments = new ArrayList<>();
     private static Utilisateur currentUser = null;
 
     public static void main(String[] args) {
@@ -577,6 +580,22 @@ public class Main {
         if (review.ajouterAvis()) {
             reviews.add(review);
             System.out.println("\n✓ Review published successfully!");
+            
+            // Process payment after successful review
+            processMissionPayment(client, mission, accepted);
+        }
+    }
+
+    private static void processMissionPayment(Client client, Mission mission, Candidature candidature) {
+        double missionBudget = mission.getBudget();
+        int paymentId = payments.size() + 1;
+        
+        Paiment payment = new Paiment(paymentId, mission, candidature.getEtudiant(), client, missionBudget);
+        
+        System.out.println("\n--- Processing Payment ---");
+        if (payment.effectuerPaiement("virement")) {
+            payments.add(payment);
+            client.setSolde(client.getSolde() - missionBudget);
         }
     }
 
@@ -654,4 +673,5 @@ public class Main {
         }
     }
 }
+
 
