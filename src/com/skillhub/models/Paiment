@@ -1,0 +1,143 @@
+package com.skillhub.models;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * Représente un paiement effectué pour une mission complétée.
+ * Responsable : Wafa (Gestion des Paiements & Commissions)
+ */
+public class Paiment {
+
+    // Champs privés
+    private int id;
+    private Mission mission;
+    private EtudiantFreelance etudiant;
+    private Client client;
+    private double montant;           // Montant brut de la mission
+    private double commission;        // 10% commission SkillHub
+    private double montantEtudiant;   // Montant net pour l'étudiant
+    private String statut;            // "en_attente", "effectué", "remboursé"
+    private LocalDateTime dateCreation;
+    private String methodePaiement;   // "virement", "carte_credit", "porte_monnaie"
+
+    // Constructeur vide
+    public Paiment() {
+        this.statut = "en_attente";
+        this.dateCreation = LocalDateTime.now();
+    }
+
+    // Constructeur complet
+    public Paiment(int id, Mission mission, EtudiantFreelance etudiant, Client client, double montant) {
+        this.id = id;
+        this.mission = mission;
+        this.etudiant = etudiant;
+        this.client = client;
+        this.montant = montant;
+        this.commission = Math.round(montant * 0.10 * 100.0) / 100.0; // 10% commission
+        this.montantEtudiant = Math.round((montant - this.commission) * 100.0) / 100.0;
+        this.statut = "en_attente";
+        this.dateCreation = LocalDateTime.now();
+    }
+
+    // Méthodes métier
+
+    /**
+     * Effectuer le paiement après validation de la mission terminée.
+     */
+    public boolean effectuerPaiement(String methode) {
+        if (!statut.equals("en_attente")) {
+            System.out.println("  ▸ Ce paiement a déjà été traité.");
+            return false;
+        }
+        if (!mission.getStatut().equals("terminée")) {
+            System.out.println("  ▸ La mission n'est pas encore terminée.");
+            return false;
+        }
+
+        this.methodePaiement = methode;
+        this.statut = "effectué";
+
+        // Créditer l'étudiant
+        etudiant.ajouterNotification("Paiement reçu : " + montantEtudiant + " DT pour la mission '" + mission.getTitre() + "'");
+        
+        // Notifier le client
+        client.ajouterNotification("Paiement de " + montant + " DT traité pour la mission '" + mission.getTitre() + "'. Commission : " + commission + " DT");
+
+        System.out.println("  ▸ Paiement #" + id + " effectué avec succès via " + methode);
+        System.out.println("  ✓ Montant brut : " + montant + " DT");
+        System.out.println("  ✓ Commission SkillHub (10%) : " + commission + " DT");
+        System.out.println("  ✓ Montant versé à l'étudiant : " + montantEtudiant + " DT");
+
+        return true;
+    }
+
+    /**
+     * Rembourser un paiement en cas de litige.
+     */
+    public boolean rembourser(String raison) {
+        if (!statut.equals("effectué")) {
+            System.out.println("  ▸ Seuls les paiements effectués peuvent être remboursés.");
+            return false;
+        }
+
+        this.statut = "remboursé";
+
+        System.out.println("  ▸ Paiement #" + id + " remboursé.");
+        System.out.println("  ▸ Raison : " + raison);
+        System.out.println("  ✓ Montant remboursé au client : " + montant + " DT");
+
+        client.ajouterNotification("Remboursement de " + montant + " DT effectué. Raison : " + raison);
+        etudiant.ajouterNotification("Litige sur la mission '" + mission.getTitre() + "'. Remboursement effectué.");
+
+        return true;
+    }
+
+    /**
+     * Afficher les détails du paiement.
+     */
+    public void afficherDetails() {
+        System.out.println("  ════════════════════════════════════════════");
+        System.out.println("  ► Paiement #" + id);
+        System.out.println("  ► Mission : " + mission.getTitre());
+        System.out.println("  ► Étudiant : " + etudiant.getPrenom() + " " + etudiant.getNom());
+        System.out.println("  ► Montant brut : " + montant + " DT");
+        System.out.println("  ► Commission (10%) : " + commission + " DT");
+        System.out.println("  ► Montant étudiant : " + montantEtudiant + " DT");
+        System.out.println("  ► Statut : " + statut);
+        System.out.println("  ► Date : " + dateCreation.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        if (methodePaiement != null) {
+            System.out.println("  ► Méthode : " + methodePaiement);
+        }
+        System.out.println("  ════════════════════════════════════════════");
+    }
+
+    // Getters
+    public int getId() { return id; }
+    public Mission getMission() { return mission; }
+    public EtudiantFreelance getEtudiant() { return etudiant; }
+    public Client getClient() { return client; }
+    public double getMontant() { return montant; }
+    public double getCommission() { return commission; }
+    public double getMontantEtudiant() { return montantEtudiant; }
+    public String getStatut() { return statut; }
+    public LocalDateTime getDateCreation() { return dateCreation; }
+    public String getMethodePaiement() { return methodePaiement; }
+
+    // Setters
+    public void setId(int id) { this.id = id; }
+    public void setMission(Mission mission) { this.mission = mission; }
+    public void setEtudiant(EtudiantFreelance etudiant) { this.etudiant = etudiant; }
+    public void setClient(Client client) { this.client = client; }
+    public void setMontant(double montant) { this.montant = montant; }
+    public void setCommission(double commission) { this.commission = commission; }
+    public void setMontantEtudiant(double montantEtudiant) { this.montantEtudiant = montantEtudiant; }
+    public void setStatut(String statut) { this.statut = statut; }
+    public void setMethodePaiement(String methodePaiement) { this.methodePaiement = methodePaiement; }
+
+    @Override
+    public String toString() {
+        return "Paiment{#" + id + " | Mission: " + mission.getTitre() + " | Montant: " + montant + " DT | Statut: " + statut + "}";
+    }
+}
+
